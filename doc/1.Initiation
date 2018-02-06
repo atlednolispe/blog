@@ -1,0 +1,33 @@
+1.
+问题描述: Terminal中可以正常运行,Pycharm中无法正常运行新建的项目
+
+Traceback (most recent call last):
+  File "/Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/manage.py", line 18, in <module>
+    execute_from_command_line(sys.argv)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/__init__.py", line 371, in execute_from_command_line
+    utility.execute()
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/__init__.py", line 365, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/base.py", line 288, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/commands/runserver.py", line 62, in execute
+    super().execute(*args, **options)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/base.py", line 335, in execute
+    output = self.handle(*args, **options)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/commands/runserver.py", line 71, in handle
+    if not settings.DEBUG and not settings.ALLOWED_HOSTS:
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/conf/__init__.py", line 56, in __getattr__
+    self._setup(name)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/conf/__init__.py", line 43, in _setup
+    self._wrapped = Settings(settings_module)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/conf/__init__.py", line 125, in __init__
+    raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+django.core.exceptions.ImproperlyConfigured: The SECRET_KEY setting must not be empty.
+
+原因:
+胡阳大大指出是环境变量的问题,更精确的问题原因还没找到。
+
+解决方案:
+在manage.py中更新环境变量"DJANGO_SETTINGS_MODULE"的值
+# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "blog.settings.%s" % profile)
+os.environ.update({"DJANGO_SETTINGS_MODULE": "blog.settings.%s" % profile})
