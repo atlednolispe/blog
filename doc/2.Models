@@ -1,0 +1,39 @@
+1.
+问题描述: Terminal中可以正常运行,Pycharm中无法正常运行新建的项目
+
+(django20) atlednolispedeMacBook-Pro:blog atlednolispe$ python3 manage.py startapp config
+Traceback (most recent call last):
+  File "manage.py", line 18, in <module>
+    execute_from_command_line(sys.argv)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/__init__.py", line 371, in execute_from_command_line
+    utility.execute()
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/__init__.py", line 347, in execute
+    django.setup()
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/apps/registry.py", line 112, in populate
+    app_config.import_models()
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/apps/config.py", line 198, in import_models
+    self.models_module = import_module(models_module_name)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 978, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 961, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 950, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 655, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 205, in _call_with_fCreate basic model definition.
+rames_removed
+  File "/Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/epsilon/models.py", line 5, in <module>
+    class Post(models.Model):
+  File "/Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/epsilon/models.py", line 14, in Post
+    category = models.ForeignKey('Category', verbose_name="种类")
+TypeError: __init__() missing 1 required positional argument: 'on_delete'
+
+原因:
+models.ForeignKey类型的字段中on_delete为必填项
+
+解决方案:
+category = models.ForeignKey('Category', verbose_name="种类")
+涉及外键的字段增加on_delete的关键字参数
+category = models.ForeignKey('Category', on_delete=models.CASCADE, verbose_name="种类")
