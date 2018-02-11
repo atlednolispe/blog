@@ -87,3 +87,5 @@ print(available_posts)  # 此时才真正查询对象
 # connection
 from django.db import connection
 connection.queries
+
+# TODO(atlednolispe) QuerySet to be completed.

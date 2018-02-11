@@ -1,8 +1,63 @@
 1.
 问题描述: Django页面展示英文切换中文基础设置(Admin)
 
+原因:
+settings中未正确设置LANGUAGE_CODE & TIME_ZONE
+
 解决方案:
 settings文件中修改以下配置:
 LANGUAGE_CODE = 'zh-hans'
 
 TIME_ZONE = 'Asia/Shanghai'
+
+2.
+问题描述: Django Admin页面展示内容为Tag object (2)
+
+原因:
+models中未定义__str__方法
+
+解决方案:
+添加__str__ method:
+    def __str__(self):
+        return self.name
+
+3.
+问题描述: 将models注册到admin的三种方案
+
+解决方案:
+(1)
+class PostAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Post)
+
+
+(2)
+class CategoryAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(Category, CategoryAdmin)
+
+由于CategoryAdmin中未定义相关内容,所以效果上
+admin.site.register(Category, CategoryAdmin) = admin.site.register(Category)
+
+
+(3)
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    pass
+
+通过decorator注册Admin
+
+4.
+问题描述: 创建管理员
+
+解决方案:
+(django20) atlednolispedeMacBook-Pro:blog atlednolispe$ python3 manage.py createsuperuser
+
+5.
+settings中的 ROOT_URLCONF = 'blog.urls' 可用于定制url提供不更改线上url的测试
+
+# TODO(atlednolispe) To be completed.
