@@ -61,3 +61,176 @@ class TagAdmin(admin.ModelAdmin):
 settings中的 ROOT_URLCONF = 'blog.urls' 可用于定制url提供不更改线上url的测试
 
 # TODO(atlednolispe) To be completed.
+
+6.
+问题描述: list_display无法展示ManyToManyField
+
+Unhandled exception in thread started by <function check_errors.<locals>.wrapper at 0x10415d2f0>
+Traceback (most recent call last):
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/autoreload.py", line 225, in wrapper
+    fn(*args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/commands/runserver.py", line 121, in inner_run
+    self.check(display_num_errors=True)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/base.py", line 410, in check
+    raise SystemCheckError(msg)
+django.core.management.base.SystemCheckError: SystemCheckError: System check identified some issues:
+
+ERRORS:
+<class 'epsilon.admin.PostAdmin'>: (admin.E109) The value of 'list_display[2]' must not be a ManyToManyField.
+
+System check identified 1 issue (0 silenced).
+
+
+原因:
+ManyToManyField fields aren’t supported, because that would entail executing a separate SQL statement for each row in the table.
+If you want to do this nonetheless, give your model a custom method, and add that method’s name to list_display.
+
+半解决方案:
+在models的定义中定制对应方法,在对应的Admin类的list_display中增加对应方法
+这样做在Admin中展示字段时显示的是方法名,暂时还未能像CharField这样通过类似verbose_name来定制
+
+class Post(models.Model):
+    ...
+    def show_tags(self):
+        return ', '.join(str(t) for t in self.tags.all())
+
+@admin.register(Post, site=custom_site)
+class PostAdmin(admin.ModelAdmin):
+    ...
+    list_display = ('title', 'category', 'show_tags', 'status', 'owner', 'created_time',)
+
+7.
+问题描述: Admin中search异常
+
+(1)
+Internal Server Error: /custom_admin/epsilon/post/
+Traceback (most recent call last):
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/exception.py", line 35, in inner
+    response = get_response(request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 128, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 126, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/options.py", line 574, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/decorators.py", line 142, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/views/decorators/cache.py", line 44, in _wrapped_view_func
+    response = view_func(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/sites.py", line 223, in inner
+    return view(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/decorators.py", line 62, in _wrapper
+    return bound_func(*args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/decorators.py", line 142, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/decorators.py", line 58, in bound_func
+    return func.__get__(self, type(self))(*args2, **kwargs2)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/options.py", line 1570, in changelist_view
+    cl = self.get_changelist_instance(request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/options.py", line 705, in get_changelist_instance
+    self,
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/views/main.py", line 76, in __init__
+    self.queryset = self.get_queryset(request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/views/main.py", line 354, in get_queryset
+    qs, search_use_distinct = self.model_admin.get_search_results(request, qs, self.query)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/options.py", line 957, in get_search_results
+    queryset = queryset.filter(reduce(operator.or_, or_queries))
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/query.py", line 836, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/query.py", line 854, in _filter_or_exclude
+    clone.query.add_q(Q(*args, **kwargs))
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/sql/query.py", line 1253, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/sql/query.py", line 1271, in _add_q
+    current_negated, allow_joins, split_subq)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/sql/query.py", line 1277, in _add_q
+    split_subq=split_subq,
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/sql/query.py", line 1215, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/sql/query.py", line 1076, in build_lookup
+    raise FieldError('Related Field got invalid lookup: {}'.format(lookup_name))
+django.core.exceptions.FieldError: Related Field got invalid lookup: icontains
+[11/Feb/2018 20:10:56] "GET /custom_admin/epsilon/post/?q=Django HTTP/1.1" 500 154393
+
+(2)
+Internal Server Error: /custom_admin/epsilon/post/
+Traceback (most recent call last):
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/exception.py", line 35, in inner
+    response = get_response(request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 128, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 126, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/options.py", line 574, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/decorators.py", line 142, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/views/decorators/cache.py", line 44, in _wrapped_view_func
+    response = view_func(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/sites.py", line 223, in inner
+    return view(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/decorators.py", line 62, in _wrapper
+    return bound_func(*args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/decorators.py", line 142, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/decorators.py", line 58, in bound_func
+    return func.__get__(self, type(self))(*args2, **kwargs2)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/options.py", line 1570, in changelist_view
+    cl = self.get_changelist_instance(request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/options.py", line 705, in get_changelist_instance
+    self,
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/views/main.py", line 76, in __init__
+    self.queryset = self.get_queryset(request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/views/main.py", line 354, in get_queryset
+    qs, search_use_distinct = self.model_admin.get_search_results(request, qs, self.query)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/admin/options.py", line 957, in get_search_results
+    queryset = queryset.filter(reduce(operator.or_, or_queries))
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/query.py", line 836, in filter
+    return self._filter_or_exclude(False, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/query.py", line 854, in _filter_or_exclude
+    clone.query.add_q(Q(*args, **kwargs))
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/sql/query.py", line 1253, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/sql/query.py", line 1271, in _add_q
+    current_negated, allow_joins, split_subq)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/sql/query.py", line 1277, in _add_q
+    split_subq=split_subq,
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/db/models/sql/query.py", line 1207, in build_filter
+    raise FieldError('Related Field got invalid lookup: {}'.format(lookups[0]))
+django.core.exceptions.FieldError: Related Field got invalid lookup: name
+[11/Feb/2018 20:26:10] "GET /custom_admin/epsilon/post/?q=test HTTP/1.1" 500 149779
+
+原因:
+(1)search_fields中对外键的字段的搜索需要用search_fields = ['foreign_key__related_fieldname']
+(2)Django的auth/models中的User的属性名为username而不是name
+
+解决方案:
+@admin.register(Post, site=custom_site)
+class PostAdmin(admin.ModelAdmin):
+    ...
+    search_fields = ['title', 'category__name', 'owner__username', ]
+
+8.
+问题描述: 简易定制Admin的后台显示以及title和Admin的urls
+
+解决方案:
+继承AdminSite来定制Admin页面,并且生成实例,并且在settings中配置对应url,注册Admin时也通过此实例注册site
+from django.contrib.admin import AdminSite
+
+
+class CustomSite(AdminSite):
+    site_header = '博客'
+    site_title = '博客管理后台'
+    index_title = '首页'
+
+
+custom_site = CustomSite(name='custom_site')
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('custom_admin/', custom_site.urls),
+]
+
+@admin.register(Category, site=custom_site)
+class CategoryAdmin(admin.ModelAdmin):
+    pass
