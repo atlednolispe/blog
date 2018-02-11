@@ -1,0 +1,8 @@
+1.
+问题描述: Django页面展示英文切换中文基础设置(Admin)
+
+解决方案:
+settings文件中修改以下配置:
+LANGUAGE_CODE = 'zh-hans'
+
+TIME_ZONE = 'Asia/Shanghai'
