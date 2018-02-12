@@ -85,14 +85,15 @@ System check identified 1 issue (0 silenced).
 ManyToManyField fields aren’t supported, because that would entail executing a separate SQL statement for each row in the table.
 If you want to do this nonetheless, give your model a custom method, and add that method’s name to list_display.
 
-半解决方案:
+解决方案:
 在models的定义中定制对应方法,在对应的Admin类的list_display中增加对应方法
-这样做在Admin中展示字段时显示的是方法名,暂时还未能像CharField这样通过类似verbose_name来定制
+这样做在Admin中展示字段时显示的是方法名,使用method的short_description属性来定制显示
 
 class Post(models.Model):
     ...
     def show_tags(self):
         return ', '.join(str(t) for t in self.tags.all())
+        show_tags.short_description = '标签'
 
 @admin.register(Post, site=custom_site)
 class PostAdmin(admin.ModelAdmin):
@@ -234,3 +235,67 @@ urlpatterns = [
 @admin.register(Category, site=custom_site)
 class CategoryAdmin(admin.ModelAdmin):
     pass
+
+9.
+问题描述: list_filter中配置了owner字段但过滤器中未显示owner相关的过滤器
+
+list_filter = ('category', 'owner')
+
+原因:
+只有单个用户时不显示过滤器,需要debug Admin的源码,搜索list_filter。(可是我好像并不能看懂对应的内容)
+
+解决方案:
+创建一个新用户
+
+10.
+问题描述: pdb debugger
+
+解决方案:
+ref: https://www.ibm.com/developerworks/cn/linux/l-cn-pythondebugger/
+
+在需要断点处增加import pdb; pdb.set_trace()
+
+l: 查看当前行的代码段
+c: 继续执行程序
+n: 执行下一行
+enter: 表示重复执行上一条debug命令
+s: 进入函数
+var: 显示var的值
+
+# 对于我们这样的小白来说,还是用IDE的debugger更容易
+
+11.
+问题描述: Admin编辑页面的定制
+
+解决方案:
+ref: https://docs.djangoproject.com/en/2.0/ref/contrib/admin/
+
+class PostAdmin(admin.ModelAdmin):
+    ...
+    date_hierarchy = 'created_time'  # 时间的层级filter
+    list_display_links = ('title', 'category')  # 可以通过点击字段到编辑页面
+    list_editable = ('status',)  # 字段可编辑
+
+    # fields = ('title', 'category',)  # 编辑页面展示哪些字段
+    # 对编辑页面的更多定制, fields & fieldsets 二选一
+    fieldsets = (
+        ('基础配置', {
+            'fields': (('title', 'category'), 'content')
+        }),
+        ('高级配置', {
+            'classes': ('collapse',),  # 点击一次才展示
+            'fields': ('tags', 'owner')
+        }),
+    )
+
+    filter_horizontal = ('tags', )  # 左右箭头挑选
+    # filter_vertical = ('tags', )
+
+    def operator(self, obj):  # 如果定义在models: miss argument obj
+        return format_html(   # TODO(atlednolispe) admin中如何调用operator方法, obj又是什么?
+            '<a href="{}">编辑</a>',
+            reverse('custom_site:epsilon_post_change', args=(obj.id,))
+        )
+    # operator.allow_tags = True  # 老版本用于转义html,现在用format_html替代
+    operator.short_description = '操作'
+    operator.empty_value_display = '???'  # 空值的默认展示
