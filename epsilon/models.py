@@ -1,5 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class Post(models.Model):
@@ -30,6 +30,7 @@ class Post(models.Model):
 
     def show_tags(self):
         return ', '.join(str(t) for t in self.tags.all())
+    show_tags.short_description = '标签'
 
     class Meta:
         verbose_name = verbose_name_plural = "文章"
