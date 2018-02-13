@@ -57,13 +57,8 @@ class Category(models.Model):
 
 
 class Tag(models.Model):
-    STATUS_ITEMS = (
-        (1, '正常'),
-        (2, '删除'),
-    )
-
     name = models.CharField(max_length=10, verbose_name="名称")
-    status = models.PositiveIntegerField(default=1, choices=STATUS_ITEMS, verbose_name="状态")
+    status = models.BooleanField(default=True, verbose_name="状态")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="作者")
 
     desc = models.CharField(max_length=128, blank=True, verbose_name="简单描述")

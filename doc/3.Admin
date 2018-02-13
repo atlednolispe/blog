@@ -370,9 +370,16 @@ class TagAdmin(admin.ModelAdmin):
 15.
 问题描述: AdminForm中定制booleanfield后不论正常删除都显示勾选状态
 
-原因:  # TODO(atlednolispe) To correct.
+原因:
+暂时还没有去源码里面探究原因的能力,但google和stackoverflow后,个人认为是models和form字段不对应造成的问题
 
 解决方案:
+把models中的PositiveIntegerField改成了BooleanField后可以正常显示,也不需要clean_status方法来对应相关字段了
+
+# blog/epsilon/models.py
+class Tag(models.Model):
+    ...
+    status = models.BooleanField(default=True, verbose_name="状态")
 
 16.
 问题描述: 编辑后内容作者变更为当前操作作者,原作者被更改
