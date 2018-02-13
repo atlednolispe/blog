@@ -6,6 +6,7 @@ settings中未正确设置LANGUAGE_CODE & TIME_ZONE
 
 解决方案:
 settings文件中修改以下配置:
+# blog/blog/settings/base.py
 LANGUAGE_CODE = 'zh-hans'
 
 TIME_ZONE = 'Asia/Shanghai'
@@ -18,6 +19,9 @@ models中未定义__str__方法
 
 解决方案:
 添加__str__ method:
+# blog/epsilon/models.py
+class Post(models.Model):
+    ...
     def __str__(self):
         return self.name
 
@@ -25,6 +29,7 @@ models中未定义__str__方法
 问题描述: 将models注册到admin的三种方案
 
 解决方案:
+# blog/epsilon/admin.py
 (1)
 class PostAdmin(admin.ModelAdmin):
     pass
@@ -89,12 +94,14 @@ If you want to do this nonetheless, give your model a custom method, and add tha
 在models的定义中定制对应方法,在对应的Admin类的list_display中增加对应方法
 这样做在Admin中展示字段时显示的是方法名,使用method的short_description属性来定制显示
 
+# blog/epsilon/models.py
 class Post(models.Model):
     ...
     def show_tags(self):
         return ', '.join(str(t) for t in self.tags.all())
         show_tags.short_description = '标签'
 
+# blog/epsilon/admin.py
 @admin.register(Post, site=custom_site)
 class PostAdmin(admin.ModelAdmin):
     ...
@@ -206,6 +213,7 @@ django.core.exceptions.FieldError: Related Field got invalid lookup: name
 (2)Django的auth/models中的User的属性名为username而不是name
 
 解决方案:
+# blog/epsilon/admin.py
 @admin.register(Post, site=custom_site)
 class PostAdmin(admin.ModelAdmin):
     ...
@@ -216,6 +224,7 @@ class PostAdmin(admin.ModelAdmin):
 
 解决方案:
 继承AdminSite来定制Admin页面,并且生成实例,并且在settings中配置对应url,注册Admin时也通过此实例注册site
+# blog/blog/custom_site.py
 from django.contrib.admin import AdminSite
 
 
@@ -227,11 +236,13 @@ class CustomSite(AdminSite):
 
 custom_site = CustomSite(name='custom_site')
 
+# blog/blog/urls.py
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('custom_admin/', custom_site.urls),
 ]
 
+# blog/epsilon/admin.py
 @admin.register(Category, site=custom_site)
 class CategoryAdmin(admin.ModelAdmin):
     pass
@@ -270,6 +281,7 @@ var: 显示var的值
 解决方案:
 ref: https://docs.djangoproject.com/en/2.0/ref/contrib/admin/
 
+# blog/epsilon/admin.py
 class PostAdmin(admin.ModelAdmin):
     ...
     date_hierarchy = 'created_time'  # 时间的层级filter
@@ -299,3 +311,58 @@ class PostAdmin(admin.ModelAdmin):
     # operator.allow_tags = True  # 老版本用于转义html,现在用format_html替代
     operator.short_description = '操作'
     operator.empty_value_display = '???'  # 空值的默认展示
+
+12.
+问题描述: Admin中表单展示的定制
+
+解决方案:
+# blog/epsilon/adminforms.py
+from django import forms
+
+
+class TagAdminForm(forms.ModelForm):
+    status = forms.BooleanField(label='正常', required=False)
+    desc = forms.CharField(widget=forms.Textarea, label='简单描述', required=False)
+
+    def clean_status(self):  # 对form传入对status数据转换为models需要的数据
+        if self.cleaned_data['status']:
+            return 1
+        else:
+            return 2
+
+# blog/epsilon/admin.py
+@admin.register(Tag, site=custom_site)
+class TagAdmin(admin.ModelAdmin):
+    ...
+    form = TagAdminForm
+
+13.
+问题描述: Admin分类编辑页面直接修改相关post内容
+
+解决方案:
+定制InlineModelAdmin
+
+# blog/epsilon/admin.py
+class PostInlineAdmin(admin.TabularInline):  # StackedInline  样式不同
+    fields = ('title', 'status')
+    extra = 1  # 额外展示的空白项个数
+    model = Post
+
+
+@admin.register(Category, site=custom_site)
+class CategoryAdmin(admin.ModelAdmin):
+    inlines = (PostInlineAdmin,)  # 直接使用类名不是字符串
+
+14.
+问题描述: Admin中定制fields后编辑页面某些必填项未展示,无法正确提交表单
+
+解决方案:
+Admin中定制save_model方法,在提交post请求前做部分处理
+
+# blog/epsilon/admin.py
+@admin.register(Tag, site=custom_site)
+class TagAdmin(admin.ModelAdmin):
+    ...
+    def save_model(self, request, obj, form, change):
+        obj.owner = request.user
+        PostAdmin.save_model(self, request, obj, form, change)

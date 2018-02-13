@@ -5,6 +5,7 @@ from django.urls import reverse
 from blog.custom_site import custom_site
 
 from .models import Post, Category, Tag
+from .adminforms import TagAdminForm
 
 
 @admin.register(Post, site=custom_site)
@@ -49,11 +50,24 @@ class PostAdmin(admin.ModelAdmin):
     operator.empty_value_display = '???'  # 空值的默认展示
 
 
+class PostInlineAdmin(admin.TabularInline):  # StackedInline  样式不同
+    fields = ('title', 'status')
+    extra = 1  # 额外展示的空白项个数
+    model = Post
+
+
 @admin.register(Category, site=custom_site)
 class CategoryAdmin(admin.ModelAdmin):
-    pass
+    inlines = (PostInlineAdmin,)  # 直接使用类名不是字符串
 
 
 @admin.register(Tag, site=custom_site)
 class TagAdmin(admin.ModelAdmin):
-    pass
+    form = TagAdminForm
+    fields = ('name', 'status', 'desc')
+    list_display = ('name', 'owner', 'status', 'desc', 'created_time')
+
+    def save_model(self, request, obj, form, change):
+        obj.owner = request.user
+        admin.ModelAdmin.save_model(self, request, obj, form, change)
+
