@@ -366,3 +366,17 @@ class TagAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.owner = request.user
         PostAdmin.save_model(self, request, obj, form, change)
+
+15.
+问题描述: AdminForm中定制booleanfield后不论正常删除都显示勾选状态
+
+原因:  # TODO(atlednolispe) To correct.
+
+解决方案:
+
+16.
+问题描述: 编辑后内容作者变更为当前操作作者,原作者被更改
+
+原因:  # TODO(atlednolispe) To correct.
+
+解决方案:
