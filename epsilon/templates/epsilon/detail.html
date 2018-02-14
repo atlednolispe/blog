@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Detail</title>
-</head>
-<body>
+{% extends 'epsilon/base.html' %}
+
+{% block title_block %}
+    detail
+{% endblock %}
+
+{% block content_block %}
     <a href="{% url 'index' %}">返回首页</a>
+    <a href="{% url 'category' post.category.id %}">{{ post.category.name }}</a>
     <h1>{{ post.title }}</h1>
     {{ post.content }}
-</body>
-</html>
+{% endblock %}

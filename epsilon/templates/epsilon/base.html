@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>atlednolispe -
+        {% block title_block %}
+            base
+        {% endblock %}
+    </title>
+</head>
+<body>
+    <ul>
+    {% for cate in nav_cates %}
+        <li><a href="{% url 'category' cate.id %}">{{ cate.name }}</a></li>
+    {% endfor %}
+    </ul>
+
+    {% block content_block %}
+    {% endblock %}
+
+    <ul>
+    {% for cate in none_nav_cates %}
+        <li><a href="{% url 'category' cate.id %}">{{ cate.name }}</a></li>
+    {% endfor %}
+    </ul>
+
+    <div>
+    {% for side in side_bars %}
+        <h4>{{ side.title }}</h4>
+        <div>
+        {% if side.display_type == 1 %}
+            {% autoescape off %}
+            {{ side.content }}
+            {% endautoescape %}
+        {% elif side.display_type == 2 %}
+            <ul>
+            {% for post in recent_posts %}
+                <li>{{ post.title }}</li>
+            {% endfor %}
+            </ul>
+        {% elif side.display_type == 4 %}
+            <ul>
+            {% for comment in recent_comments %}
+                <li>{{ comment.content }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        </div>
+    {% endfor %}
+    </div>
+</body>
+</html>

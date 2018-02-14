@@ -173,3 +173,12 @@ def post_list(request, category_id=None, tag_id=None):
     queryset = queryset.order_by('-id')
     paginator = Paginator(queryset, per_page)
     post = paginator.get_page(page)
+
+7.
+问题描述: 简单的通用配置以及模版
+
+解决方案:
+在views中将通用操作单独写到函数,在不同的view中单独调用这个函数,写一个模版文件,其余html通过extends使用
+
+注意事项:
+继承模版的时候需要{% extends 'app_name/base.html' %},block命名推荐    使用{% block title_block %}

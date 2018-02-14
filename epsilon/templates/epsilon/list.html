@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>List</title>
-</head>
-<body>
-    <h1>list</h1>
-    <ul>
-    {% for cate in nav_cates %}
-        <li><a href="{% url 'category' cate.id %}">{{ cate.name }}</a></li>
-    {% endfor %}
-    </ul>
+{% extends 'epsilon/base.html' %}
+
+{% block title_block %}
+    list
+{% endblock %}
+
+{% block content_block %}
     {% if posts %}
         {% for post in posts %}
         <li>
@@ -26,35 +20,4 @@
     {% else %}
         什么都没有呀!
     {% endif %}
-
-    <ul>
-    {% for cate in none_nav_cates %}
-        <li><a href="{% url 'category' cate.id %}">{{ cate.name }}</a></li>
-    {% endfor %}
-    </ul>
-    <ul>
-    {% for side in side_bars %}
-        <h4>{{ side.title }}</h4>
-        <div>
-        {% if side.display_type == 1 %}
-            {% autoescape off %}
-            {{ side.content }}
-            {% endautoescape %}
-        {% elif side.display_type == 2 %}
-            <ul>
-            {% for post in recent_posts %}
-                <li>{{ post.title }}</li>
-            {% endfor %}
-            </ul>
-        {% elif side.display_type == 4 %}
-            <ul>
-            {% for comment in recent_comments %}
-                <li>{{ comment.content }}</li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-        </div>
-    {% endfor %}
-    </ul>
-</body>
-</html>
+{% endblock %}
