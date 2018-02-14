@@ -1,0 +1,44 @@
+1.
+问题描述: 简单的View,Template配置
+
+解决方案:
+# blog/epsilon/templates/epsilon/list.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List</title>
+</head>
+<body>
+    <h1>list</h1>
+    {{ name }}
+</body>
+</html>
+
+# blog/epsilon/views.py
+def post_list(request, category_id=None, tag_id=None):
+    context = {
+        'name': 'post_list'
+    }
+    return render(request, 'epsilon/list.html', context=context)
+
+# blog/blog/settings/base.py
+...
+urlpatterns = [
+    path('', post_list),
+    re_path(r'^category/(?P<category_id>\d+)/$', post_list),
+    re_path(r'^tag/(?P<tag_id>\d+)\.html$', post_list),  # SEO
+    ...
+]
+
+# 中间碰到一个很坑的问题,Chrome好像记住了之前访问过的http://127.0.0.1:8000/tag/1.html/,
+# 导致http://127.0.0.1:8000/tag/1.html不能正常访问,换浏览器后解决
+
+2.
+问题描述: TemplateDoesNotExist
+
+原因:
+新增加templates文件夹后需要重启程序,否则无法正确加载模版
+
+解决方案:
+重启程序
