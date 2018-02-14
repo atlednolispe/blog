@@ -117,3 +117,59 @@ urlpatterns = [
 解决方案:
 ManyToManyField.related_name 反向引用的属性名,默认为post_set
 ManyToManyField.through 给中间表增加字段
+
+5.
+问题描述: 简单的数据分页
+
+解决方案:
+# blog/epsilon/views.py
+from django.core.paginator import Paginator
+...
+
+def post_list(request, category_id=None, tag_id=None):
+    queryset = Post.objects.all()
+    page = request.GET.get('page', 1)  # ?page=2
+    per_page = 3
+
+    try:
+        page = int(page)
+    except TypeError:
+        page = 1
+
+    ...
+
+    queryset = queryset.order_by('-id')
+    paginator = Paginator(queryset, per_page)
+    post = paginator.get_page(page)
+
+# blog/epsilon/templates/epsilon/list.html
+...
+    {% if posts.has_previous %} <a href="?page={{ posts.number|add:"-1" }}">上一页</a> {% endif %}
+    第{{ posts.number }}页(共{{ posts.paginator.num_pages }}页)
+    {% if posts.has_next %} <a href="?page={{ posts.number|add:"1" }}">下一页</a> {% endif %}
+
+6.
+问题描述: 分页结果可能不一致
+
+/Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/epsilon/views.py:29: UnorderedObjectListWarning: Pagination may yield inconsistent results with an unordered object_list: <class 'epsilon.models.Post'> QuerySet.
+  paginator = Paginator(queryset, per_page)
+
+原因:
+queryset结果未经过排序
+
+解决方案:
+(1)
+# blog/epsilon/models.py
+class Post(models.Model):
+    ...
+    class Meta:
+        verbose_name = verbose_name_plural = "文章"
+        # ordering = ['-id']
+
+(2)
+# blog/epsilon/views.py
+def post_list(request, category_id=None, tag_id=None):
+    ...
+    queryset = queryset.order_by('-id')
+    paginator = Paginator(queryset, per_page)
+    post = paginator.get_page(page)
