@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path
 
 from epsilon.views import post_list, post_detail
 # from config.views import links
@@ -23,11 +23,12 @@ from .custom_site import custom_site
 
 
 urlpatterns = [
-    path('', post_list),
-    re_path(r'^category/(?P<category_id>\d+)/$', post_list),
-    re_path(r'^tag/(?P<tag_id>\d+)\.html$', post_list),  # SEO
-    re_path(r'^post/(?P<post_id>\d+)/$', post_detail),
-    # re_path(r'^links/$', links),
+    path('', post_list, name='index'),
+    path('category/<int:category_id>/', post_list, name='category'),
+    path('tag/<int:tag_id>/', post_list, name='tag'),
+    path('post/<int:id>/', post_detail, name='detail'),
+    # path('post/<int:id>.html/', post_detail, name='detail'),  # SEO
+    # path('links/', links),
     path('admin/', admin.site.urls),
     path('custom_admin/', custom_site.urls),
 ]

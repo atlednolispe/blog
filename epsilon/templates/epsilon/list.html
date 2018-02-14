@@ -6,7 +6,12 @@
 </head>
 <body>
     <h1>list</h1>
-    {{ name }}
-    {{ tag_id }}
+    <ul>
+        {% for post in posts %}
+            title: <a href="{% url 'detail' post.id %}">{{ post.title }}</a> <br/>
+            owner: {{ post.owner }}
+            <hr/>
+        {% endfor %}
+    </ul>
 </body>
 </html>

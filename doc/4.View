@@ -42,3 +42,78 @@ urlpatterns = [
 
 解决方案:
 重启程序
+
+3.
+问题描述: view简单的获取数据并且展示页面
+
+解决方案:
+# blog/epsilon/views.py
+from django.http import Http404
+from django.shortcuts import render
+
+from .models import Post, Tag
+
+
+def post_list(request, category_id=None, tag_id=None):
+    queryset = Post.objects.all()
+    if category_id:
+        queryset = queryset.filter(category_id=category_id)
+    elif tag_id:
+        try:
+            tag = Tag.objects.get(id=tag_id)
+        except Tag.DoesNotExist:
+            queryset = []
+        else:
+            queryset = tag.post_set.all()
+
+    context = {
+        'posts': queryset
+    }
+    return render(request, 'epsilon/list.html', context=context)
+
+
+def post_detail(request, id=None):
+    try:
+        post = Post.objects.get(id=id)
+    except Post.DoesNotExist:
+        raise Http404("Post doesn't exist!")
+
+    context = {
+        'post': post
+    }
+    return render(request, 'epsilon/detail.html', context=context)
+
+# ref: The model layer -> Model instances -> Accessing related objects
+# ManyToManyField内容的获取需要用属性的方法获取:tag.post_set.all()
+
+# blog/blog/urls.py
+urlpatterns = [
+    path('post/<int:id>/', post_detail, name='detail'),
+    ...
+]
+
+# blog/epsilon/templates/epsilon/list.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List</title>
+</head>
+<body>
+    <h1>list</h1>
+    <ul>
+        {% for post in posts %}
+            title: <a href="{% url 'detail' post.id %}">{{ post.title }}</a> <br/>
+            owner: {{ post.owner }}
+            <hr/>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
+4.
+问题描述: ManyToManyField相关设置
+
+解决方案:
+ManyToManyField.related_name 反向引用的属性名,默认为post_set
+ManyToManyField.through 给中间表增加字段

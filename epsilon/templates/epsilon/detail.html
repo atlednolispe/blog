@@ -5,7 +5,8 @@
     <title>Detail</title>
 </head>
 <body>
-    <h1>detail</h1>
-    {{ name }}
+    <a href="{% url 'index' %}">返回首页</a>
+    <h1>{{ post.title }}</h1>
+    {{ post.content }}
 </body>
 </html>
