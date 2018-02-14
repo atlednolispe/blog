@@ -7,14 +7,54 @@
 <body>
     <h1>list</h1>
     <ul>
-        {% for post in posts %}
-            title: <a href="{% url 'detail' post.id %}">{{ post.title }}</a> <br/>
-            owner: {{ post.owner }}
-            <hr/>
-        {% endfor %}
+    {% for cate in nav_cates %}
+        <li><a href="{% url 'category' cate.id %}">{{ cate.name }}</a></li>
+    {% endfor %}
     </ul>
-    {% if posts.has_previous %} <a href="?page={{ posts.number|add:"-1" }}">上一页</a> {% endif %}
-    第{{ posts.number }}页(共{{ posts.paginator.num_pages }}页)
-    {% if posts.has_next %} <a href="?page={{ posts.number|add:"1" }}">下一页</a> {% endif %}
+    {% if posts %}
+        {% for post in posts %}
+        <li>
+            title: <a href="{% url 'detail' post.id %}">{{ post.title }}</a>
+            owner: {{ post.owner }}
+        </li>
+        {% endfor %}
+        <br/>
+        {% if posts.has_previous %} <a href="?page={{ posts.number|add:"-1" }}">上一页</a> {% endif %}
+        第{{ posts.number }}页(共{{ posts.paginator.num_pages }}页)
+        {% if posts.has_next %} <a href="?page={{ posts.number|add:"1" }}">下一页</a> {% endif %}
+        <hr/>
+    {% else %}
+        什么都没有呀!
+    {% endif %}
+
+    <ul>
+    {% for cate in none_nav_cates %}
+        <li><a href="{% url 'category' cate.id %}">{{ cate.name }}</a></li>
+    {% endfor %}
+    </ul>
+    <ul>
+    {% for side in side_bars %}
+        <h4>{{ side.title }}</h4>
+        <div>
+        {% if side.display_type == 1 %}
+            {% autoescape off %}
+            {{ side.content }}
+            {% endautoescape %}
+        {% elif side.display_type == 2 %}
+            <ul>
+            {% for post in recent_posts %}
+                <li>{{ post.title }}</li>
+            {% endfor %}
+            </ul>
+        {% elif side.display_type == 4 %}
+            <ul>
+            {% for comment in recent_comments %}
+                <li>{{ comment.content }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        </div>
+    {% endfor %}
+    </ul>
 </body>
 </html>
