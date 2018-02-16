@@ -181,4 +181,127 @@ def post_list(request, category_id=None, tag_id=None):
 在views中将通用操作单独写到函数,在不同的view中单独调用这个函数,写一个模版文件,其余html通过extends使用
 
 注意事项:
-继承模版的时候需要{% extends 'app_name/base.html' %},block命名推荐    使用{% block title_block %}
+继承模版的时候需要{% extends 'app_name/base.html' %},block命名推荐使用{% block title_block %}
+
+8.
+问题描述: function view -> class-based view
+
+解决方案:
+1. Override get_context_data method to adding extra context.
+2. Abstract common part to a single method to make big method smaller.
+3. Override get_queryset method to filter data.(default models.objects.all())
+4. Some optional attributes(like context_object_name, paginate_by, ordering)
+5. variable (page_obj, paginator) to use pagination in template
+
+# blog/epsilon/views.py
+from django.views.generic import ListView, DetailView
+
+...
+class CommonMixin:
+    def get_category_context(self):
+        categories = Category.objects.filter(status=1)  # filter '可用'
+        nav_cates = [cate for cate in categories if cate.is_nav]
+        none_nav_cates = [cate for cate in categories if not cate.is_nav]
+
+        return {
+            'nav_cates': nav_cates,
+            'none_nav_cates': none_nav_cates
+        }
+
+    def get_context_data(self, **kwargs):
+        side_bars = SideBar.objects.filter(status=1)  # fliter展示
+        recent_posts = Post.objects.filter(status=1).order_by('-created_time')[:3]
+        # hot_posts = Post.objects.filter(status=1).order_by('-views')[:3]
+        recent_comments = Comment.objects.filter(status=1).order_by('-created_time')[:3]
+
+        context = {
+            'side_bars': side_bars,
+            'recent_posts': recent_posts,
+            'recent_comments': recent_comments
+        }
+        kwargs.update(self.get_category_context())
+        kwargs.update(context)
+
+        return super().get_context_data(**kwargs)
+
+
+class BasePostView(CommonMixin, ListView):
+    model = Post
+    template_name = 'epsilon/list.html'
+    context_object_name = 'posts'
+    paginate_by = 3
+    ordering = '-id'
+
+
+class IndexView(BasePostView):
+    pass
+
+
+class CategoryView(BasePostView):
+    def get_queryset(self):
+        qs = BasePostView.get_queryset(self)
+        cate_id = self.kwargs.get('category_id')
+        qs = qs.filter(category_id=cate_id)
+        return qs
+
+
+class TagView(BasePostView):
+    def get_queryset(self):
+        tag_id = self.kwargs.get('tag_id')
+        try:
+            tag = Tag.objects.get(id=tag_id)
+        except Tag.DoesNotExist:
+            return []
+
+        posts = tag.post_set.all()
+        return posts
+
+# blog/blog/urls.py
+from epsilon.views import IndexView, PostView, CategoryView, TagView
+
+...
+urlpatterns = [
+    path('', IndexView.as_view(), name='index'),
+]
+
+# blog/epsilon/templates/epsilon/list.html
+{% extends "epsilon/base.html" %}
+
+{% block title_block %}
+    list
+{% endblock %}
+
+{% block content_block %}
+<ul>
+    <hr/>
+
+    {% if posts %}
+        {% for post in posts %}
+        <li>
+            title: <a href="{% url 'detail' post.id %}">{{ post.title }} </a><br/>
+            owner: {{ post.owner }} <br/>
+        </li>
+        {% endfor %}
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}">上一页</a>
+                {% endif %}
+
+                <span class="current">
+                    第 {{ page_obj.number }} 页 (共{{ paginator.num_pages }}页)
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">下一页</a>
+                {% endif %}
+            </span>
+        </div>
+    {% else %}
+        什么都没有呀老兄!
+    {% endif %}
+</ul>
+{% endblock %}
+
+
+# TODO(atlednolispe) class-based view中对于404之类的异常处理。
