@@ -1,0 +1,58 @@
+1.
+问题描述: bootstrap基础使用
+
+解决方案:
+1. class="container" -> class="row" -> class="column"
+2. cdn
+
+# TODO(atlednolispe) To be completed.
+
+2.
+问题描述: settings配置导入文件的选择
+
+解决方案:
+(1). settings引入全局变量
+from django.conf import settings
+
+(2). 手动导入配置
+from blog/settings/development.py import THEME
+# 当运行环境切换时需要手动修改配置(development -> online)
+
+# 最终选择
+# blog/epsilon/views.py
+from django.conf import settings
+
+...
+settings.THEME
+
+3.
+问题描述: base.html渲染失败
+
+Internal Server Error: /
+Traceback (most recent call last):
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/exception.py", line 35, in inner
+    response = get_response(request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 158, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 156, in _get_response
+    response = response.render()
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/template/response.py", line 106, in render
+    self.content = self.rendered_content
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/template/response.py", line 81, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/template/response.py", line 63, in resolve_template
+    return select_template(template, using=self.using)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/template/loader.py", line 47, in select_template
+    raise TemplateDoesNotExist(', '.join(template_name_list), chain=chain)
+django.template.exceptions.TemplateDoesNotExist: epsilon/templates/themes/epsilon/list.html, epsilon/post_list.html
+
+原因:
+queryset结果未经过排序
+epsilon/templates/themes/epsilon/list.html: base.html中extends使用的是绝对路径{% extends "./base.html" %},templates路径与结构改变后无法正确渲染。
+
+epsilon/post_list.html: class-based view中默认的templates路径-app_name/model_(list OR detail).html
+
+解决方案:
+# extends base.html的文件由绝对路径修改为相对路径
+
+{% extends "./base.html" %}

@@ -14,3 +14,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+THEME_DIR = 'themes/'
+THEME_TYPE = 'default/'
+THEME = THEME_DIR + THEME_TYPE

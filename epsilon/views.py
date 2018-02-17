@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.views.generic import ListView, DetailView
 
 from config.models import SideBar
@@ -36,7 +37,7 @@ class CommonMixin:
 
 class BasePostView(CommonMixin, ListView):
     model = Post
-    template_name = 'epsilon/list.html'
+    template_name = settings.THEME + 'epsilon/list.html'
     context_object_name = 'posts'
     paginate_by = 3
     ordering = '-id'
@@ -68,4 +69,4 @@ class TagView(BasePostView):
 
 class PostView(CommonMixin, DetailView):
     model = Post
-    template_name = 'epsilon/detail.html'
+    template_name = settings.THEME + 'epsilon/detail.html'
