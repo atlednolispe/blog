@@ -35,3 +35,73 @@ class-based view中通过post方法处理
 解决方案:
 # 插件 EditThisCookie 可以手动修改cookies
 # TODO(altednolispe) To be done.
+
+4.
+问题描述: 在post提交时未正确生成实例属性,如何在view中为实例增加属性
+
+# blog/comment/forms.py
+class CommentForm(forms.ModelForm):
+    ...
+    class Meta:
+        model = Comment
+        fields = ['nickname', 'email', 'website', 'content']
+
+# request.path只记录本次请求的地址,上一次的请求不作记录
+class CommentView(TemplateView):
+    ...
+    def post(self, request, *args, **kwargs):
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save()
+
+原因:
+# 生成实例存入数据库时只传递fields中的字段,即使request.POST.data中存在额外的参数也不用于构造新实例
+comment_form = CommentForm(request.POST)
+if comment_form.is_valid():
+    comment = comment_form.save(commit=False)
+
+解决方案:
+# blog/comment/views.py
+# 通过form.save()向数据库存储新对象时设置参数commit=False,可以生成新实例,以便在view中更改对象属性
+# request.path只记录本次请求的地址,上一次的请求不作记录
+class CommentView(TemplateView):
+    ...
+    def post(self, request, *args, **kwargs):
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.target = request.POST.get('target')
+            comment.save()
+            succeed = True
+        else:
+            succeed = False
+
+        extra_context = {
+            'succeed': succeed,
+            'form': comment_form,
+        }
+
+        context = self.get_context_data(**kwargs)
+        context.update(extra_context)
+        return self.render_to_response(context)
+
+# blog/templates/themes/html5up/comment/result.html
+<form action="{% url "comment:index" %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="target" value="{{ request.path }}">
+    {{ comment_form }}
+    <div class="12u$" style="margin-top: 10px">
+        <ul class="actions">
+            <li><input type="submit" value="起飞" class="special"/></li>
+        </ul>
+    </div>
+</form>
+
+5.
+问题描述: 在问题4中,评论详情页面是url是通过html中的hidden数据来提交,可以手动篡改这个值,如何修改
+
+原因:
+post.path只记录当前请求的路径,无法正确获得前一请求的路径,hidden可以在浏览器中手动更改
+
+解决方案:
+# TODO(altednolispe) To be done.

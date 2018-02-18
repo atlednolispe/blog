@@ -1,6 +1,7 @@
 from django.views.generic import ListView, DetailView, TemplateView
 
 from config.models import SideBar
+from comment.forms import CommentForm
 from comment.models import Comment
 
 from .models import Post, Tag, Category
@@ -83,3 +84,9 @@ class TagView(BasePostView):
 class PostView(CommonMixin, DetailView):
     model = Post
     template_name = 'solid_state/generic.html'
+
+    def get_context_data(self, **kwargs):
+        kwargs.update({
+            'comment_form': CommentForm(),
+        })
+        return super().get_context_data(**kwargs)

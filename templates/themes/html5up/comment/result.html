@@ -1,0 +1,22 @@
+{% extends "../solid_state/base.html" %}
+{% load static %}
+
+{% block head_block %}
+    <style>
+        .errorlist {color: red;}
+    </style>
+{% endblock %}
+
+
+{% block content_block %}
+    <section class="wrapper">
+        <div class="inner">
+        {% if succeed %}
+            <p>已经成功评论了。lalala</p>
+        {% else %}
+            <p>出错咯！</p>
+            {{ form }}
+        </div>
+        {% endif %}
+    </section>
+{% endblock %}

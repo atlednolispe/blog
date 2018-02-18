@@ -1,7 +1,5 @@
 from django.db import models
 
-from epsilon.models import Post
-
 
 class Comment(models.Model):
     STATUS_ITEMS = (
@@ -9,7 +7,7 @@ class Comment(models.Model):
         (2, '删除'),
     )
 
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name="文章")
+    target = models.CharField(max_length=200, null=True, verbose_name="评论所属url")
     content = models.CharField(max_length=2000, verbose_name="内容")
     nickname = models.CharField(max_length=50, verbose_name="昵称")
 
