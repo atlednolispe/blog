@@ -25,6 +25,7 @@ from .custom_site import custom_site
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('blog/', include('epsilon.urls')),
+    path('config/', include('config.urls')),
     path('admin/', admin.site.urls),
     path('custom_admin/', custom_site.urls),
 ]
