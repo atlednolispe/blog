@@ -105,3 +105,25 @@ post.path只记录当前请求的路径,无法正确获得前一请求的路径,
 
 解决方案:
 # TODO(altednolispe) To be done.
+
+6.
+问题描述: 通过forms.ModelForm定制来修改表单
+
+解决方案:
+# blog/comment/forms.py
+class CommentForm(forms.ModelForm):
+    target = forms.CharField(max_length=100, widget=forms.widgets.HiddenInput)  # 对表单字段进行定制
+    content = forms.CharField(label="内容", widget=forms.widgets.Textarea(attrs={'rows': 6, 'cols': 80}))
+    ...
+        class Meta:
+        model = Comment
+        fields = ['target', 'nickname', 'email', 'website', 'content']
+
+# blog/epsilon/views.py
+class PostView(CommonMixin, DetailView):
+    ...
+    def get_context_data(self, **kwargs):
+        kwargs.update({
+            'comment_form': CommentForm(initial={'target': self.request.path}),  # 渲染表单时提供初始数据
+        })
+        return super().get_context_data(**kwargs)
