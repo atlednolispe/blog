@@ -31,6 +31,7 @@
                 <section>
                     <form action="{% url "comment:index" %}" method="post">
                         {% csrf_token %}
+                        <input name="target" type="hidden" value="{{ request.path }}">
                         {{ comment_form }}
                         <div class="12u$" style="margin-top: 10px">
                             <ul class="actions">
