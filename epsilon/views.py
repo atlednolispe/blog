@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, TemplateView
 
 from config.models import SideBar
 from comment.models import Comment
@@ -37,13 +37,17 @@ class CommonMixin:
 
 class BasePostView(CommonMixin, ListView):
     model = Post
-    template_name = settings.THEME + 'epsilon/list.html'
+    template_name = 'solid_state/elements.html'
     context_object_name = 'posts'
     paginate_by = 3
     ordering = '-id'
 
 
-class IndexView(BasePostView):
+class IndexView(TemplateView):
+    template_name = 'aerial/index.html'
+
+
+class PostIndexView(BasePostView):
     pass
 
 
@@ -69,4 +73,4 @@ class TagView(BasePostView):
 
 class PostView(CommonMixin, DetailView):
     model = Post
-    template_name = settings.THEME + 'epsilon/detail.html'
+    template_name = 'solid_state/generic.html'

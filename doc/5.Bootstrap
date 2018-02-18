@@ -4,6 +4,7 @@
 解决方案:
 1. class="container" -> class="row" -> class="column"
 2. cdn
+3. .post .title {}: class="post"/class="title"
 
 # TODO(atlednolispe) To be completed.
 
@@ -56,3 +57,116 @@ epsilon/post_list.html: class-based view中默认的templates路径-app_name/mod
 # extends base.html的文件由绝对路径修改为相对路径
 
 {% extends "./base.html" %}
+
+4.
+问题描述: 自定义templates的filter
+
+解决方案:
+# blog/templatetags/filters.py
+from django import template
+
+english = {
+    1: 'one',
+    2: 'two',
+    3: 'three',
+}
+
+register = template.Library()
+
+
+@register.filter
+def mod(dividend, divisor):
+    return dividend % divisor + 1
+
+# template中使用
+{{ forloop.counter0|mod:3 }}
+
+# blog/blog/settings/development.py
+# settings中配置TEMPLATES的libraries
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates', THEME),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+
+            'libraries': {
+                'filters': 'templatetags.filters'
+            }
+        },
+    },
+]
+
+5.
+问题描述: str变成了tuple
+
+SITE_PACKAGES = [s_p for s_p in sys.path if s_p.endswith('site-packages')][0],
+
+原因:
+SITE_PACKAGES = xxx,  <==> SITE_PACKAGES = (xxx,)
+由于最后误写一个,导致str变成tuple类型
+
+解决方案:
+SITE_PACKAGES = [s_p for s_p in sys.path if s_p.endswith('site-packages')][0]
+
+6.
+问题描述: settings中模版文件路径, 静态文件路径, 获取静态文件显示的前缀的设置
+
+原因:
+
+
+解决方案:
+# blog/blog/settings/development.py
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [  # 模版文件的路径
+            os.path.join(BASE_DIR, 'templates', THEME),
+            os.path.join(SITE_PACKAGES, 'django/contrib/admin/templates'),
+        ],
+        'APP_DIRS': False,  # 关闭APP搜索加快模版搜索速度
+    },
+]
+
+# 额外的静态文件的路径
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# "GET /hello/aerial/assets/css/main.css HTTP/1.1" 200
+STATIC_URL = '/hello/'  # 获取静态文件显示的前缀
+
+7.
+问题描述: 根据APP配置urls
+
+解决方案:
+# blog/epsilon/urls.py
+from django.urls import path
+
+from .views import PostIndexView, PostView, CategoryView, TagView
+
+
+app_name = 'epsilon'  # template中使用<a href="{% url 'epsilon:detail' post.id %}">
+urlpatterns = [
+    path('', PostIndexView.as_view(), name='index'),
+    path('category/<int:category_id>/', CategoryView.as_view(), name='category'),
+    path('tag/<int:tag_id>/', TagView.as_view(), name='tag'),
+    path('post/<int:pk>/', PostView.as_view(), name='detail'),
+]
+
+# blog/blog/urls.py
+from django.urls import include
+
+
+urlpatterns = [
+    path('blog/', include('epsilon.urls')),
+    ...
+]

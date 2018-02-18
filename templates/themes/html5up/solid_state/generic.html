@@ -1,0 +1,37 @@
+{% extends './base.html' %}
+{% load static %}
+{% load filters %}
+
+{% block content_block %}
+<!-- Wrapper -->
+<section id="wrapper">
+    <header>
+        <div class="inner">
+            <h2>{{ post.title }}</h2>
+            <p>{{ post.desc }}</p>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#"><b style="color: #157fde">Home</b></a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'epsilon:category' post.category.id %}"><b style="color: #157fde">{{ post.category.name }}</b></a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><b style="color: black">Home</b></li>
+                </ol>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Content -->
+        <div class="wrapper">
+            <div class="inner">
+
+                <h3 class="major">Lorem ipsum dolor</h3>
+                <p>{{ post.content }}</p>
+
+                <p>Vestibulum ultrices risus velit, sit amet blandit massa auctor sit amet. Sed eu lectus sem. Phasellus in odio at ipsum porttitor mollis id vel diam. Praesent sit amet posuere risus, eu faucibus lectus. Vivamus ex ligula, tempus pulvinar ipsum in, auctor porta quam. Proin nec commodo, vel scelerisque nisi scelerisque. Suspendisse id quam vel tortor tincidunt suscipit. Nullam auctor orci eu dolor consectetur, interdum ullamcorper ante tincidunt. Mauris felis nec felis elementum varius.</p>
+
+            </div>
+        </div>
+
+</section>
+{% endblock %}
+
+
