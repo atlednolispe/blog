@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.views.generic import ListView, DetailView, TemplateView
 
 from config.models import SideBar
@@ -39,7 +38,7 @@ class BasePostView(CommonMixin, ListView):
     model = Post
     template_name = 'solid_state/elements.html'
     context_object_name = 'posts'
-    paginate_by = 3
+    paginate_by = 1
     ordering = '-id'
 
 
@@ -48,7 +47,17 @@ class IndexView(TemplateView):
 
 
 class PostIndexView(BasePostView):
-    pass
+    def get_queryset(self):
+        query = self.request.GET.get('query')
+        qs = BasePostView.get_queryset(self)
+
+        if query:
+            qs = qs.filter(title__icontains=query)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        query = self.request.GET.get('query')
+        return super().get_context_data(query=query)
 
 
 class CategoryView(BasePostView):

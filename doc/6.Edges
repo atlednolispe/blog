@@ -1,0 +1,37 @@
+1.
+问题描述: 增加搜索功能
+
+解决方案:
+# blog/epsilon/views.py
+class PostIndexView(BasePostView):
+    def get_queryset(self):  # 获取get的query参数返回经过filter的数据
+        query = self.request.GET.get('query')
+        qs = BasePostView.get_queryset(self)
+
+        if query:
+            qs = qs.filter(title__icontains=query)
+        return qs
+
+    def get_context_data(self, **kwargs):  # 对查询的分页传递query参数,否则除首页外无法filter
+        query = self.request.GET.get('query')
+        return super().get_context_data(query=query)
+
+# blog/templates/themes/html5up/solid_state/elements.html
+# 分页href中增加query查询参数
+<li><a href="?page=1&query={{ query }}" class="button big previous">1</a></li>
+
+2.
+问题描述: 搜索功能改成post
+
+解决方案:
+class-based view中通过post方法处理
+# TODO(altednolispe) To be done.
+
+3.
+问题描述: XSS攻击
+
+页面中可以通过用户输入渲染html或者js之类的内容会导致XSS攻击,小心!
+
+解决方案:
+# 插件 EditThisCookie 可以手动修改cookies
+# TODO(altednolispe) To be done.

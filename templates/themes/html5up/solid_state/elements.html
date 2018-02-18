@@ -18,56 +18,100 @@
 
 				<!-- Wrapper -->
 					<section id="wrapper">
-                    {% for post in posts %}
-                        	<section id="{{ forloop.counter0|mod_eng:3 }}" class="wrapper {% if forloop.counter0|alt_filter:2 %}alt{% endif %} spotlight style{{ forloop.counter0|mod:3 }}">
-								<div class="inner">
-									<a href="#" class="image"><img src="" alt="" /></a>
-									<div class="content">
-                                        <h2 class="major"><a href="{% url 'epsilon:detail' post.id %}">{{ post.title }}</a></h2>
-										<p>{{ post.desc }}</p>
-										<a href="#" class="special">Learn more</a>
-									</div>
-								</div>
-							</section>
-                    {% endfor %}
+                    {% if posts %}
+                        {% for post in posts %}
+                                <section id="{{ forloop.counter0|mod_eng:3 }}" class="wrapper {% if forloop.counter0|alt_filter:2 %}alt{% endif %} spotlight style{{ forloop.counter0|mod:3 }}">
+                                    <div class="inner">
+                                        <a href="#" class="image"><img src="" alt="" /></a>
+                                        <div class="content">
+                                            <h2 class="major"><a href="{% url 'epsilon:detail' post.id %}">{{ post.title }}</a></h2>
+                                            <p>{{ post.desc }}</p>
+                                            <a href="#" class="special">Learn more</a>
+                                        </div>
+                                    </div>
+                                </section>
+                        {% endfor %}
 
-                            <section class="wrapper spotlight style1">
-                                <div class="inner">
-                                    <ul class="actions pagination">
-                                    {% if page_obj.number == 1 %}
-                                        <li><a href="#" class="disabled button big previous">上一页</a></li>
-                                    {% elif page_obj.number == 2 %}
-                                        <li><a href="#" class="button big previous">上一页</a></li>
-                                        <li><a href="?page=1" class="button big previous">1</a></li>
-                                    {% elif page_obj.number == 3 %}
-                                        <li><a href="#" class="button big previous">上一页</a></li>
-                                        <li><a href="?page=1" class="button big previous">1</a></li>
-                                        <li><a href="?page=1" class="button big previous">2</a></li>
-                                    {% else %}
-                                        <li><a href="#" class="button big previous">上一页</a></li>
-                                        <li><a href="?page=1" class="button big previous">1</a></li>
-                                        <li><span class="button big">&hellip;</span></li>
-                                        <li><a href="?page={{ page_obj.previous_page_number }}" class="button big previous">{{ page_obj.previous_page_number }}</a></li>
-                                    {% endif %}
-                                        <li><a href="#" class="button big" style="border: solid 2px">{{ page_obj.number }}</a></li>
-                                    {% if page_obj.number < paginator.num_pages|add:-2 %}
-                                        <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">{{ page_obj.next_page_number }}</a></li>
-                                        <li><span class="button big">&hellip;</span></li>
-                                        <li><a href="?page={{ paginator.num_pages }}" class="button big previous">{{ paginator.num_pages }}</a></li>
-                                        <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">下一页</a></li>
-                                    {% elif page_obj.number < paginator.num_pages|add:-1 %}
-                                        <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">{{ page_obj.next_page_number }}</a></li>
-                                        <li><a href="?page={{ paginator.num_pages }}" class="button big previous">{{ paginator.num_pages }}</a></li>
-                                        <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">下一页</a></li>
-                                    {% elif page_obj.number < paginator.num_pages %}
-                                        <li><a href="?page={{ paginator.num_pages }}" class="button big previous">{{ paginator.num_pages }}</a></li>
-                                        <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">下一页</a></li>
-                                    {% else %}
-                                        <li><a href="#" class="disabled button big previous">下一页</a></li>
-                                    {% endif %}
-                                    </ul>
-                                </div>
-                            </section>
-
+                                <section class="wrapper spotlight style1">
+                                    <div class="inner">
+                                        <ul class="actions pagination">
+                                        {% if query %}
+                                            {% if page_obj.number == 1 %}
+                                                <li><a href="#" class="disabled button big previous">上一页</a></li>
+                                            {% elif page_obj.number == 2 %}
+                                                <li><a href="#" class="button big previous">上一页</a></li>
+                                                <li><a href="?page=1&query={{ query }}" class="button big previous">1</a></li>
+                                            {% elif page_obj.number == 3 %}
+                                                <li><a href="#" class="button big previous">上一页</a></li>
+                                                <li><a href="?page=1&query={{ query }}" class="button big previous">1</a></li>
+                                                <li><a href="?page=1&query={{ query }}" class="button big previous">2</a></li>
+                                            {% else %}
+                                                <li><a href="#" class="button big previous">上一页</a></li>
+                                                <li><a href="?page=1&query={{ query }}" class="button big previous">1</a></li>
+                                                <li><span class="button big">&hellip;</span></li>
+                                                <li><a href="?page={{ page_obj.previous_page_number }}&query={{ query }}" class="button big previous">{{ page_obj.previous_page_number }}</a></li>
+                                            {% endif %}
+                                                <li><a href="#" class="button big" style="border: solid 2px">{{ page_obj.number }}</a></li>
+                                            {% if page_obj.number < paginator.num_pages|add:-2 %}
+                                                <li><a href="?page={{ page_obj.next_page_number }}&query={{ query }}" class="button big previous">{{ page_obj.next_page_number }}</a></li>
+                                                <li><span class="button big">&hellip;</span></li>
+                                                <li><a href="?page={{ paginator.num_pages }}&query={{ query }}" class="button big previous">{{ paginator.num_pages }}</a></li>
+                                                <li><a href="?page={{ page_obj.next_page_number }}&query={{ query }}" class="button big previous">下一页</a></li>
+                                            {% elif page_obj.number < paginator.num_pages|add:-1 %}
+                                                <li><a href="?page={{ page_obj.next_page_number }}&query={{ query }}" class="button big previous">{{ page_obj.next_page_number }}</a></li>
+                                                <li><a href="?page={{ paginator.num_pages }}&query={{ query }}" class="button big previous">{{ paginator.num_pages }}</a></li>
+                                                <li><a href="?page={{ page_obj.next_page_number }}&query={{ query }}" class="button big previous">下一页</a></li>
+                                            {% elif page_obj.number < paginator.num_pages %}
+                                                <li><a href="?page={{ paginator.num_pages }}&query={{ query }}" class="button big previous">{{ paginator.num_pages }}</a></li>
+                                                <li><a href="?page={{ page_obj.next_page_number }}&query={{ query }}" class="button big previous">下一页</a></li>
+                                            {% else %}
+                                                <li><a href="#" class="disabled button big previous">下一页</a></li>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if page_obj.number == 1 %}
+                                                <li><a href="#" class="disabled button big previous">上一页</a></li>
+                                            {% elif page_obj.number == 2 %}
+                                                <li><a href="#" class="button big previous">上一页</a></li>
+                                                <li><a href="?page=1" class="button big previous">1</a></li>
+                                            {% elif page_obj.number == 3 %}
+                                                <li><a href="#" class="button big previous">上一页</a></li>
+                                                <li><a href="?page=1" class="button big previous">1</a></li>
+                                                <li><a href="?page=1" class="button big previous">2</a></li>
+                                            {% else %}
+                                                <li><a href="#" class="button big previous">上一页</a></li>
+                                                <li><a href="?page=1" class="button big previous">1</a></li>
+                                                <li><span class="button big">&hellip;</span></li>
+                                                <li><a href="?page={{ page_obj.previous_page_number }}" class="button big previous">{{ page_obj.previous_page_number }}</a></li>
+                                            {% endif %}
+                                                <li><a href="#" class="button big" style="border: solid 2px">{{ page_obj.number }}</a></li>
+                                            {% if page_obj.number < paginator.num_pages|add:-2 %}
+                                                <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">{{ page_obj.next_page_number }}</a></li>
+                                                <li><span class="button big">&hellip;</span></li>
+                                                <li><a href="?page={{ paginator.num_pages }}" class="button big previous">{{ paginator.num_pages }}</a></li>
+                                                <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">下一页</a></li>
+                                            {% elif page_obj.number < paginator.num_pages|add:-1 %}
+                                                <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">{{ page_obj.next_page_number }}</a></li>
+                                                <li><a href="?page={{ paginator.num_pages }}" class="button big previous">{{ paginator.num_pages }}</a></li>
+                                                <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">下一页</a></li>
+                                            {% elif page_obj.number < paginator.num_pages %}
+                                                <li><a href="?page={{ paginator.num_pages }}" class="button big previous">{{ paginator.num_pages }}</a></li>
+                                                <li><a href="?page={{ page_obj.next_page_number }}" class="button big previous">下一页</a></li>
+                                            {% else %}
+                                                <li><a href="#" class="disabled button big previous">下一页</a></li>
+                                            {% endif %}
+                                        {% endif %}
+                                        </ul>
+                                    </div>
+                                </section>
+                    {% else %}
+                                <section id="one" class="wrapper spotlight style1">
+                                    <div class="inner">
+                                        <a href="#" class="image"><img src="" alt="" /></a>
+                                        <div class="content">
+                                            <h2 class="major">空空如也</h2>
+                                        </div>
+                                    </div>
+                                </section>
+                    {% endif %}
 					</section>
 {% endblock %}
