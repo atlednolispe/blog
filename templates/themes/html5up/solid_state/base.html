@@ -36,6 +36,11 @@
 						<div class="inner">
 							<h2>导航</h2>
 							<ul class="links">
+                                <li>
+                                    <form id="search" method="get" action="{% url "epsilon:index" %}">
+                                        <input type="text" name="query" placeholder="搜索" style="text-align: center" />
+                                    </form>
+                                </li>
                                 <li><a href="/">首页</a></li>
                                 <li><a href="{% url 'epsilon:index' %}">博客</a></li>
 								<li><a href="#">登录</a></li>
