@@ -112,6 +112,13 @@ post.path只记录当前请求的路径,无法正确获得前一请求的路径,
 解决方案:
 # blog/comment/forms.py
 class CommentForm(forms.ModelForm):
+    nickname = forms.CharField(
+        required=False,
+        label='昵称',
+        max_length=50,
+        widget=forms.widgets.TextInput(),
+        empty_value='匿名',
+    )
     target = forms.CharField(max_length=100, widget=forms.widgets.HiddenInput)  # 对表单字段进行定制
     content = forms.CharField(label="内容", widget=forms.widgets.Textarea(attrs={'rows': 6, 'cols': 80}))
     ...
@@ -127,3 +134,41 @@ class PostView(CommonMixin, DetailView):
             'comment_form': CommentForm(initial={'target': self.request.path}),  # 渲染表单时提供初始数据
         })
         return super().get_context_data(**kwargs)
+
+6.
+问题描述: 分类评论
+
+解决方案:
+# 分离form部分的html,在其他页面中{% include '../comment/block.html' %}引入
+# 在页面对应的view中修改get_context_data方法增加传递的上下文参数
+
+# blog/config/views.py
+from comment.forms import CommentForm
+...
+class LinkView(CommonMixin, ListView):
+    ...
+    def get_context_data(self, **kwargs):  # 否则页面中不渲染form
+        kwargs.update({
+            'comment_form': CommentForm(),
+        })
+        return super().get_context_data(**kwargs)
+
+# blog/templates/themes/html5up/solid_state/links.html
+...
+{% block comment_block %}
+    {% include '../comment/block.html' %}
+{% endblock %}
+
+# blog/templates/themes/html5up/comment/block.html
+<section>
+    <form action="{% url "comment:index" %}" method="post">
+        {% csrf_token %}
+        <input name="target" type="hidden" value="{{ request.path }}">
+        {{ comment_form }}
+        <div class="12u$" style="margin-top: 10px">
+            <ul class="actions">
+                <li><input type="submit" value="起飞" class="special"/></li>
+            </ul>
+        </div>
+    </form>
+</section>
