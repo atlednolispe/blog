@@ -1,3 +1,5 @@
+import markdown
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -22,6 +24,9 @@ class Post(models.Model):
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
 
+    is_markdown = models.BooleanField(verbose_name="使用markdown格式", default=True)
+    content_html = models.TextField(verbose_name="markdown渲染后的数据", default='')
+
     def __str__(self):
         """
         If not define __str__, the show in admin is XXX object(Num).
@@ -31,6 +36,12 @@ class Post(models.Model):
     def show_tags(self):
         return ', '.join(str(t) for t in self.tags.all())
     show_tags.short_description = '标签'
+
+    def save(self, *args, **kwargs):
+        if self.is_markdown:
+            self.content_html = markdown.markdown(self.content)
+
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = verbose_name_plural = "文章"

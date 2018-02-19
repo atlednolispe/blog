@@ -228,3 +228,28 @@ class PostView(CommonMixin, CommentShowMixin, DetailView):
 class CommentView(TemplateView):
     ...
     http_method_names = ('post',)
+
+10.
+问题描述: Markdown展示文章
+
+解决方案:
+# (django20) atlednolispedeMBP:blog atlednolispe$ pip3 install Markdown
+
+# blog/epsilon/models.py
+import markdown
+
+class Post(models.Model):
+    ...
+    is_markdown = models.BooleanField(verbose_name="使用markdown格式", default=True)
+    content_html = models.TextField(verbose_name="markdown渲染后的数据", default='')
+
+    def save(self, *args, **kwargs):
+        if self.is_markdown:
+            self.content_html = markdown.markdown(self.content)
+
+        return super().save(*args, **kwargs)
+
+# blog/templates/themes/html5up/solid_state/generic.html
+{% autoescape off %}
+<div>{{ post.content_html }}</div>
+{% endautoescape %}
