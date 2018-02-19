@@ -253,3 +253,40 @@ class Post(models.Model):
 {% autoescape off %}
 <div>{{ post.content_html }}</div>
 {% endautoescape %}
+
+11.
+问题描述: Markdown美化
+
+解决方案:
+# blog/epsilon/models.py
+class Post(models.Model):
+    ...
+    def save(self, *args, **kwargs):
+        if self.is_markdown:
+            config = {
+                'codehilite': {
+                    'use_pygments': False,
+                    'css_class': 'prettyprint linenums',
+                }
+            }
+            self.content_html = markdown.markdown(self.content, extensions=['codehilite'], extension_configs=config)
+
+        return super().save(*args, **kwargs)
+
+# blog/templates/html5up/solid_state/generic.html
+{% block head_block %}
+    <!--
+    <link href="https://cdn.rawgit.com/google/code-prettify/master/loader/skins/desert.css" rel="stylesheet">
+    -->
+{% endblock %}
+
+{% block javascript %}
+    <!--
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?"></script>
+    <script>
+    window.onload = function () {
+        PR.prettyPrint();
+    }
+    </script>
+    -->
+{% endblock %}

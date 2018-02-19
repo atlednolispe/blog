@@ -45,4 +45,17 @@
 </section>
 {% endblock %}
 
+{% block head_block %}
+    <link href="https://cdn.rawgit.com/google/code-prettify/master/loader/skins/desert.css" rel="stylesheet">
+{% endblock %}
+
+{% block javascript %}
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?"></script>
+    <script>
+    window.onload = function () {
+        PR.prettyPrint();
+    }
+    </script>
+{% endblock %}
+
 
