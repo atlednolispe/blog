@@ -136,7 +136,7 @@ class PostView(CommonMixin, DetailView):
         return super().get_context_data(**kwargs)
 
 6.
-问题描述: 分类评论
+问题描述: 分离评论
 
 解决方案:
 # 分离form部分的html,在其他页面中{% include '../comment/block.html' %}引入
@@ -172,3 +172,59 @@ class LinkView(CommonMixin, ListView):
         </div>
     </form>
 </section>
+
+7.
+问题描述: 创建基类来使评论表单以及对应页面评论的展示模块化
+
+解决方案:
+# blog/comment/views.py
+class CommentShowMixin:
+    def get_comments(self):
+        target = self.request.path
+        comments = Comment.objects.filter(target=target).order_by('-id')
+        return comments
+
+    def get_context_data(self, **kwargs):
+        kwargs.update({
+            'comment_form': CommentForm(),
+            'comment_list': self.get_comments(),
+        })
+        return super().get_context_data(**kwargs)
+
+# blog/epsilon/views.py
+from comment.views import CommentShowMixin
+...
+
+class PostView(CommonMixin, CommentShowMixin, DetailView):
+    model = Post
+    template_name = 'solid_state/generic.html'
+
+# blog/templates/themes/html5up/comment/block.html
+<section>
+    ...
+
+    <div class="show_comments">
+    {% for comment in comment_list %}
+        <div>
+            <h4 class="major"><a href="{{ comment.website }}">{{ comment.nickname }} - {{ comment.created_time }}</a></h4>
+            <p>{{ comment.content }}</p>
+        </div>
+    {% endfor %}
+    </div>
+
+</section>
+
+8.
+问题描述: 将comment的部分用template tag改写
+
+解决方案:
+# TODO(atlednolispe) To be done.
+
+9.
+问题描述: 限制页面请求的方法
+
+解决方案:
+# blog/comment/views.py
+class CommentView(TemplateView):
+    ...
+    http_method_names = ('post',)

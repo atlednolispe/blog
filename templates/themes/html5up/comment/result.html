@@ -13,9 +13,11 @@
         <div class="inner">
         {% if succeed %}
             <p>已经成功评论了。lalala</p>
+            <a href="{{ target }}">返回</a>
         {% else %}
             <p>出错咯！</p>
             {{ form }}
+            <a href="javascript:window.history.back();">返回</a>
         </div>
         {% endif %}
     </section>
