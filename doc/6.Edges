@@ -370,3 +370,30 @@ class PostView(CommonMixin, CommentShowMixin, DetailView):
 
         self.object.increase_pv()
         self.object.increase_uv()
+
+2. 使用django.core.cache
+# blog/blog/settings/development.py
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/tmp/django_cache',
+    }
+}
+
+# blog/epsilon/views.py
+from django.core.cache import cache
+
+class PostView(CommonMixin, CommentShowMixin, DetailView):
+        sessionid = self.request.COOKIES.get('sessionid')
+        if not sessionid:
+            return
+
+        pv_key = 'pv:%s:%s' % (sessionid, self.request.path)
+        if not cache.get(pv_key):
+            self.object.increase_pv()
+            cache.set(pv_key, 1, 30)  # cache.set(key, value, timeout), redis: cache.set(key, timeout, value)
+
+        uv_key = 'uv:%s:%s' % (sessionid, self.request.path)
+        if not cache.get(uv_key):
+            self.object.increase_uv()
+            cache.set(uv_key, 1, 60*60*24)

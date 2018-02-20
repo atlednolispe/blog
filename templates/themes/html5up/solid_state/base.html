@@ -70,7 +70,7 @@
                                     {% endautoescape %}
                                     {% elif side.display_type == 3 %}
                                     {% for post in hot_posts %}
-                                    <p>{{ post.title }} -  {{ post.pv }}</p>
+                                    <p>{{ post.title }} -  {{ post.pv }} - {{ post.uv }}</p>
                                     {% endfor %}
                                     {% elif side.display_type == 4 %}
                                     {% for comment in recent_comments %}
