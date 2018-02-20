@@ -301,3 +301,72 @@ code {
     border: none;
 }
 
+11.
+问题描述: markdown所见即所得
+
+解决方案:
+# ace前端编辑器 https://ace.c9.io
+
+12.
+问题描述: 访问量统计
+
+统计方法:
+1. 访问实时统计
+2. 访问延迟处理 celery
+3. 页面增加js或者js使用<img />统计
+4. 分析ngnix日志
+
+难点:
+1. 同时访问pv会丢失
+
+2. uv判断
+(1) redis/共享内存
+# gloabl_variable = {
+#     'id': '2018/02/20 18:00:00'
+# }
+#
+# if id in gloabl_variable:
+#     if now - gloabl_variable[id] > 1 day:
+#         count += 1
+#         gloabl_variable[id] = now
+# else:
+#     gloabl_variable[id] = now
+
+(2) cookie
+# 但要对每个页面都记录可能cookie overflow
+
+解决方案:
+1. 使用数据库的数据更新操作替换python层的更新解决同时访问pv会丢失的情况
+
+# blog/epsilon/models.py
+from django.db.models import F
+
+class Post(models.Model):
+    ...
+    pv = models.PositiveIntegerField(default=0, verbose_name="pv")
+    uv = models.PositiveIntegerField(default=0, verbose_name="uv")
+
+    ...
+    def increase_pv(self):
+        return type(self).objects.filter(id=self.id).update(pv=F('pv') + 1)
+
+    def increase_uv(self):
+        return type(self).objects.filter(id=self.id).update(uv=F('uv') + 1)
+
+# blog/epsilon/views.py
+class PostView(CommonMixin, CommentShowMixin, DetailView):
+    model = Post
+    template_name = 'solid_state/generic.html'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)  # 调用后才生成self.object
+        self.pv_uv()
+        return response
+
+    def pv_uv(self):
+        # self.object.pv += 1  # pv数据丢失
+        # self.object.uv += 1
+        # self.object.save()
+
+        self.object.increase_pv()
+        self.object.increase_uv()

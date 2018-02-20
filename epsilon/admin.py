@@ -13,7 +13,7 @@ from .adminforms import TagAdminForm
 class PostAdmin(BaseOwnerAdmin):
     list_display = (
         'title', 'category', 'show_tags', 'status',
-        'created_time', 'operator'
+        'pv', 'uv', 'created_time', 'operator'
     )
     search_fields = ('title', 'category__name')
 

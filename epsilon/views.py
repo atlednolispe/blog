@@ -21,13 +21,14 @@ class CommonMixin:
     def get_context_data(self, **kwargs):
         side_bars = SideBar.objects.filter(status=1)  # fliter展示
         recent_posts = Post.objects.filter(status=1).order_by('-created_time')[:3]
-        # hot_posts = Post.objects.filter(status=1).order_by('-views')[:3]
+        hot_posts = Post.objects.filter(status=1).order_by('-pv')[:3]
         recent_comments = Comment.objects.filter(status=1).order_by('-created_time')[:3]
 
         context = {
             'side_bars': side_bars,
             'recent_posts': recent_posts,
-            'recent_comments': recent_comments
+            'recent_comments': recent_comments,
+            'hot_posts': hot_posts,
         }
         kwargs.update(self.get_category_context())
         kwargs.update(context)
@@ -84,3 +85,19 @@ class TagView(BasePostView):
 class PostView(CommonMixin, CommentShowMixin, DetailView):
     model = Post
     template_name = 'solid_state/generic.html'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        self.pv_uv()
+        return response
+
+    def pv_uv(self):
+        # self.object.pv += 1
+        # self.object.uv += 1
+        # self.object.save()
+
+        self.object.increase_pv()
+        self.object.increase_uv()
+
+
+

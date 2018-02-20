@@ -2,6 +2,7 @@ import markdown
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import F
 
 
 class Post(models.Model):
@@ -26,6 +27,8 @@ class Post(models.Model):
 
     is_markdown = models.BooleanField(verbose_name="使用markdown格式", default=True)
     content_html = models.TextField(verbose_name="markdown渲染后的数据", default='')
+    pv = models.PositiveIntegerField(default=0, verbose_name="pv")
+    uv = models.PositiveIntegerField(default=0, verbose_name="uv")
 
     def __str__(self):
         """
@@ -36,6 +39,12 @@ class Post(models.Model):
     def show_tags(self):
         return ', '.join(str(t) for t in self.tags.all())
     show_tags.short_description = '标签'
+
+    def increase_pv(self):
+        return type(self).objects.filter(id=self.id).update(pv=F('pv') + 1)
+
+    def increase_uv(self):
+        return type(self).objects.filter(id=self.id).update(uv=F('uv') + 1)
 
     def save(self, *args, **kwargs):
         if self.is_markdown:
