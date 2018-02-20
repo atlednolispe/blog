@@ -1,4 +1,5 @@
 {% load static %}
+{% load filters %}
 
 <!DOCTYPE HTML>
 <!--
@@ -74,7 +75,7 @@
                                     {% endfor %}
                                     {% elif side.display_type == 4 %}
                                     {% for comment in recent_comments %}
-                                    <p>{{ comment.content }}</p>
+                                    <p>{{ comment.content|content_cut_off:50 }}</p>
                                     {% endfor %}
                                     {% endif %}
                                     <a href="#" class="special">Learn more</a>

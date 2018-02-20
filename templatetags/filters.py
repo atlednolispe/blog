@@ -23,3 +23,7 @@ def mod_eng(dividend, divisor):
 def alt_filter(dividend, divisor):
     return dividend % divisor == 0
 
+
+@register.filter
+def content_cut_off(content, length):
+    return content[:length]
