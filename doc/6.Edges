@@ -273,20 +273,31 @@ class Post(models.Model):
 
         return super().save(*args, **kwargs)
 
+# 使用google/code-prettify支持markdown
+# 但好像在不同的markdown语法之间要用#分割不然会有代码乱码
+# https://github.com/google/code-prettify
 # blog/templates/html5up/solid_state/generic.html
 {% block head_block %}
-    <!--
-    <link href="https://cdn.rawgit.com/google/code-prettify/master/loader/skins/desert.css" rel="stylesheet">
-    -->
+    <link href="{% static "google-code-prettify/skins/desert.css" %}" rel="stylesheet">
 {% endblock %}
 
 {% block javascript %}
-    <!--
-    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?"></script>
+    <script src="{% static "google-code-prettify/prettify.js" %}"></script>
     <script>
     window.onload = function () {
         PR.prettyPrint();
     }
     </script>
-    -->
 {% endblock %}
+
+# blog/static/custom/code-pretty.css
+# 美化代码显示格式
+pre code {
+    padding: 0px;
+}
+
+code {
+    background: none;
+    border: none;
+}
+

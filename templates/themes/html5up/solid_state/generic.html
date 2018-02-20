@@ -29,8 +29,6 @@
                 <div>{{ post.content_html }}</div>
                 {% endautoescape %}
 
-                <p>Vestibulum ultrices risus velit, sit amet blandit massa auctor sit amet. Sed eu lectus sem. Phasellus in odio at ipsum porttitor mollis id vel diam. Praesent sit amet posuere risus, eu faucibus lectus. Vivamus ex ligula, tempus pulvinar ipsum in, auctor porta quam. Proin nec commodo, vel scelerisque nisi scelerisque. Suspendisse id quam vel tortor tincidunt suscipit. Nullam auctor orci eu dolor consectetur, interdum ullamcorper ante tincidunt. Mauris felis nec felis elementum varius.</p>
-
             {% block comment_block %}
                 {% include '../comment/block.html' %}
             {% endblock %}
@@ -46,11 +44,11 @@
 {% endblock %}
 
 {% block head_block %}
-    <link href="https://cdn.rawgit.com/google/code-prettify/master/loader/skins/desert.css" rel="stylesheet">
+    <link href="{% static "google-code-prettify/skins/desert.css" %}" rel="stylesheet">
 {% endblock %}
 
 {% block javascript %}
-    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?"></script>
+    <script src="{% static "google-code-prettify/prettify.js" %}"></script>
     <script>
     window.onload = function () {
         PR.prettyPrint();
