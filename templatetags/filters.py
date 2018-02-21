@@ -27,3 +27,13 @@ def alt_filter(dividend, divisor):
 @register.filter
 def content_cut_off(content, length):
     return content[:length]
+
+
+@register.filter
+def subsection(content, length):
+    html = ''
+
+    while content:
+        sub, content = content[:length], content[length:]
+        html += '<p>%s</p>\n' % sub
+    return html

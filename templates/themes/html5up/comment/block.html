@@ -1,23 +1,28 @@
-<section>
-    <h2 class="major">评论</h2>
-    <form action="{% url "comment:index" %}" method="post">
-        {% csrf_token %}
-        <input name="target" type="hidden" value="{{ request.path }}">
-        {{ comment_form }}
-        <div class="12u$" style="margin-top: 10px">
-            <ul class="actions">
-                <li><input type="submit" value="开喷咯" class="special"/></li>
-            </ul>
-        </div>
-    </form>
+{% load filters %}
 
-    <div class="show_comments">
-    {% for comment in comment_list %}
-        <div>
-            <h4 class="major"><a href="{{ comment.website }}">{{ comment.nickname }} - {{ comment.created_time }}</a></h4>
-            <p>{{ comment.content }}</p>
-        </div>
-    {% endfor %}
+<div class="wrapper">
+    <div class="inner">
+        <section>
+            <h2 class="major">评论</h2>
+            <form action="{% url "comment:index" %}" method="post">
+                {% csrf_token %}
+                <input name="target" type="hidden" value="{{ request.path }}">
+                {{ comment_form }}
+                <div class="12u$" style="margin-top: 10px">
+                    <ul class="actions">
+                        <li><input type="submit" value="开喷咯" class="special"/></li>
+                    </ul>
+                </div>
+            </form>
+
+            <div class="show_comments">
+            {% for comment in comment_list %}
+                <div>
+                    <h4 class="major"><a href="{{ comment.website }}">{{ comment.nickname }} - {{ comment.created_time }}</a></h4>
+                    <p>{{ comment.content|content_cut_off:50 }}</p>
+                </div>
+            {% endfor %}
+            </div>
+        </section>
     </div>
-
-</section>
+</div>

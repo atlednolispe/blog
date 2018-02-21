@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 
 from comment.views import CommentShowMixin
-from epsilon.views import CommonMixin
+from blog.views import CommonMixin
 
 from .models import Link
 

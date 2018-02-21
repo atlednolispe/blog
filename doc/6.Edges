@@ -397,3 +397,100 @@ class PostView(CommonMixin, CommentShowMixin, DetailView):
         if not cache.get(uv_key):
             self.object.increase_uv()
             cache.set(uv_key, 1, 60*60*24)
+
+13.
+问题描述: 公共类导入失败
+
+/Users/atlednolispe/.virtualenvs/django20/bin/python /Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/manage.py runserver 8000
+Performing system checks...
+
+Unhandled exception in thread started by <function check_errors.<locals>.wrapper at 0x104c54ea0>
+Traceback (most recent call last):
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/autoreload.py", line 225, in wrapper
+    fn(*args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/commands/runserver.py", line 121, in inner_run
+    self.check(display_num_errors=True)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/base.py", line 364, in check
+    include_deployment_checks=include_deployment_checks,
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/management/base.py", line 351, in _run_checks
+    return checks.run_checks(**kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/checks/registry.py", line 73, in run_checks
+    new_errors = check(app_configs=app_configs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/checks/urls.py", line 13, in check_url_config
+    return check_resolver(resolver)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/checks/urls.py", line 23, in check_resolver
+    return check_method()
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/urls/resolvers.py", line 397, in check
+    for pattern in self.url_patterns:
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/functional.py", line 36, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/urls/resolvers.py", line 536, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/utils/functional.py", line 36, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/urls/resolvers.py", line 529, in urlconf_module
+    return import_module(self.urlconf_name)
+  File "/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 978, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 961, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 950, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 655, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 678, in exec_module
+  File "<frozen importlib._bootstrap>", line 205, in _call_with_frames_removed
+  File "/Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/blog/urls.py", line 19, in <module>
+    from epsilon.views import IndexView
+  File "/Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/epsilon/views.py", line 5, in <module>
+    from comment.views import CommentShowMixin
+  File "/Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/comment/views.py", line 4, in <module>
+    from epsilon.views import CommonMixin
+ImportError: cannot import name 'CommonMixin'
+
+
+# blog/urls.py
+from epsilon.views import IndexView
+
+# epsilon/views.py
+from comment.views import CommentShowMixin
+
+class CommonMixin:
+    pass
+
+class IndexView(TemplateView):
+    pass
+
+# comment/views.py
+from epsilon.views import CommonMixin
+
+class CommentShowMixin:
+    pass
+
+class RecentComments(CommonMixin, ListView):
+    pass
+
+******************************  中间好了又失败了。。。
+
+# blog/urls.py
+from epsilon.views import IndexView
+
+# epsilon/views.py
+from comment.views import CommentShowMixin
+class CommonMixin:
+    pass
+
+class IndexView(TemplateView):
+    pass
+
+# comment/views.py
+class CommentShowMixin:
+    pass
+
+from epsilon.views import CommonMixin
+
+class RecentComments(CommonMixin, ListView):
+    pass
+
+解决方案:
+把class CommonMixin单独拆分到blog/blog/views.py
+
+# TODO(atlednolispe) Recursive import.

@@ -1,0 +1,47 @@
+{% extends '../solid_state/base.html' %}
+{% load static %}
+{% load filters %}
+
+{% block content_block %}
+				<!-- Banner -->
+					<section id="banner">
+						<div class="inner">
+                            <div class="row">
+                                {% for cate in nav_cates %}
+                                    <div class="logo col-md"><span class="icon fa-github-alt"></span><a href="{% url 'epsilon:category' cate.id %}">{{ cate.name }}</a></div>
+                                {% endfor %}
+                            </div>
+							<h2>这是我的个人博客。</h2>
+                            <p>依赖<a href="https://www.djangoproject.com/">Django 2.0</a> + <a href="https://getbootstrap.com/">Bootstrap 4.0</a> + <a href="http://html5up.net">HTML5 UP</a></p>
+						</div>
+					</section>
+
+				<!-- Wrapper -->
+					<section id="wrapper">
+                    {% if recent_comments %}
+                        {% for comment in recent_comments %}
+                                <section id="{{ forloop.counter0|mod_eng:3 }}" class="wrapper {% if forloop.counter0|alt_filter:2 %}alt{% endif %} spotlight style{{ forloop.counter0|mod:3 }}">
+                                    <div class="inner">
+                                        <a href="#" class="image"><img src="" alt="" /></a>
+                                        <div class="content">
+                                            <h2 class="major">{{ comment.nickname }}</h2>
+                                            {% autoescape off %}
+                                            <p>{{ comment.content|subsection:200 }}</p>
+                                            {% endautoescape %}
+                                            <p><a href="{{ comment.target }}">浏览评论对应文章</a> </p>
+                                        </div>
+                                    </div>
+                                </section>
+                        {% endfor %}
+                    {% else %}
+                                <section id="one" class="wrapper spotlight style1">
+                                    <div class="inner">
+                                        <a href="#" class="image"><img src="" alt="" /></a>
+                                        <div class="content">
+                                            <h2 class="major">空空如也</h2>
+                                        </div>
+                                    </div>
+                                </section>
+                    {% endif %}
+					</section>
+{% endblock %}

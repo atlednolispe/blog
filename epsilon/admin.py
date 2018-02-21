@@ -23,7 +23,8 @@ class PostAdmin(BaseOwnerAdmin):
 
     fieldsets = (
         ('基础配置', {
-            'fields': (('title', 'category'), 'is_markdown', 'content')
+            'fields': (('title', 'category'), 'is_markdown',
+                       'content', 'desc')
         }),
         ('高级配置', {
             'classes': ('collapse',),  # 点击一次才展示

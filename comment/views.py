@@ -1,5 +1,7 @@
 from django.shortcuts import redirect
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
+
+from blog.views import CommonMixin
 
 from .forms import CommentForm
 from .models import Comment
@@ -46,3 +48,9 @@ class CommentView(TemplateView):
         context = self.get_context_data(**kwargs)
         context.update(extra_context)
         return self.render_to_response(context)
+
+
+class RecentComments(CommonMixin, ListView):
+    template_name = 'comment/recent_comments.html'
+    queryset = Comment.objects.order_by('-id')[:3]
+    context_object_name = 'recent_comments'

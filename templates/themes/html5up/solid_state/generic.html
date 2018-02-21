@@ -25,22 +25,20 @@
                 <!--
                 <h3 class="major">Lorem ipsum dolor</h3>
                 -->
-                {% autoescape off %}
-                <div>{{ post.content_html }}</div>
-                {% endautoescape %}
-
-            {% block comment_block %}
-                {% include '../comment/block.html' %}
-            {% endblock %}
+                {% if post.content_html %}
+                    {% autoescape off %}
+                    <div>{{ post.content_html }}</div>
+                    {% endautoescape %}
+                {% else %}
+                    <div>{{ post.content }}</div>
+                {% endif %}
             </div>
-
-
         </div>
-
-
-
-
 </section>
+{% endblock %}
+
+{% block comment_block %}
+    {% include '../comment/block.html' %}
 {% endblock %}
 
 {% block head_block %}

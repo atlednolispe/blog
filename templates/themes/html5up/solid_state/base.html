@@ -56,6 +56,10 @@
 
             {% block content_block %}
             {% endblock %}
+
+            {% block comment_block %}
+            {% endblock %}
+
                 <section id="wrapper">
                     <!-- Four -->
                     <section id="four" class="wrapper alt style1">
@@ -71,14 +75,18 @@
                                     {% endautoescape %}
                                     {% elif side.display_type == 3 %}
                                     {% for post in hot_posts %}
-                                    <p>{{ post.title }} -  {{ post.pv }} - {{ post.uv }}</p>
+                                        <p><a href="{% url 'epsilon:detail' post.id %}">{{ post.title }}</a> - {{ post.pv }} - {{ post.uv }}</p>
                                     {% endfor %}
                                     {% elif side.display_type == 4 %}
                                     {% for comment in recent_comments %}
-                                    <p>{{ comment.content|content_cut_off:50 }}</p>
+                                    <p><a href="{{ comment.target }}">{{ comment.content|content_cut_off:50 }}</a></p>
                                     {% endfor %}
                                     {% endif %}
+                                    {% if side.display_type == 4 %}
+                                    <a href="{% url 'comment:recent_comments' %}" class="special">Learn more</a>
+                                    {% else %}
                                     <a href="#" class="special">Learn more</a>
+                                    {% endif %}
                                 </article>
                             {% endfor %}
                             </section>
