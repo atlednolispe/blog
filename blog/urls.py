@@ -13,20 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
+import xadmin
+
 from django.urls import path, include
+from xadmin.plugins import xversion
 
 from epsilon.views import IndexView
-# from config.views import links
+from blog import adminx
 
-from .custom_site import custom_site
 
+xadmin.autodiscover()
+xversion.register_models()  # revision & widget
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('blog/', include('epsilon.urls')),
     path('config/', include('config.urls')),
     path('comment/', include('comment.urls')),
-    path('admin/', admin.site.urls),
-    path('custom_admin/', custom_site.urls),
+    path('admin/', xadmin.site.urls),  # admin & custom_admin removed
 ]

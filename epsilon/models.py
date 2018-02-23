@@ -26,7 +26,7 @@ class Post(models.Model):
     update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
 
     is_markdown = models.BooleanField(verbose_name="使用markdown格式", default=True)
-    content_html = models.TextField(verbose_name="markdown渲染后的数据", default='')
+    content_html = models.TextField(verbose_name="markdown渲染后的数据", default='', blank=True)
     pv = models.PositiveIntegerField(default=0, verbose_name="pv")
     uv = models.PositiveIntegerField(default=0, verbose_name="uv")
 
@@ -54,7 +54,15 @@ class Post(models.Model):
                     'css_class': 'prettyprint linenums',
                 }
             }
-            self.content_html = markdown.markdown(self.content, extensions=['codehilite'], extension_configs=config)
+            self.content_html = markdown.markdown(
+                self.content,
+                extensions=[
+                    'codehilite',
+                    'extra',
+                    'toc',
+                ],
+                extension_configs=config
+            )
 
         return super().save(*args, **kwargs)
 

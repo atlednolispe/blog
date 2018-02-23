@@ -1,12 +1,10 @@
-from django.contrib import admin
+import xadmin
 
-from blog.custom_admin import BaseOwnerAdmin
-from blog.custom_site import custom_site
+from blog.adminx import BaseOwnerAdmin
 
 from .models import Comment
 
 
-@admin.register(Comment, site=custom_site)
 class CommentAdmin(BaseOwnerAdmin):
     list_filter = ('email', 'status')
     search_fields = ('target', 'content')
@@ -21,3 +19,7 @@ class CommentAdmin(BaseOwnerAdmin):
             'fields': ('nickname', 'website', 'email')
         }),
     )
+
+
+xadmin.site.register(Comment, CommentAdmin)
+

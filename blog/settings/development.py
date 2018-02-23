@@ -31,7 +31,9 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates', THEME),
-            os.path.join(SITE_PACKAGES, 'django/contrib/admin/templates'),
+            os.path.join(SITE_PACKAGES, 'xadmin/templates'),
+            os.path.join(SITE_PACKAGES, 'crispy_forms/templates'),
+            os.path.join(SITE_PACKAGES, 'reversion/templates'),
         ],
         'APP_DIRS': False,
         'OPTIONS': {

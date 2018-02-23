@@ -34,6 +34,11 @@ INSTALLED_APPS = [
     'epsilon',
     'config',
     'comment',
+    'blog',
+
+    'xadmin',
+    'crispy_forms',
+    'reversion',
 
     'django.contrib.admin',
     'django.contrib.auth',
