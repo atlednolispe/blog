@@ -80,3 +80,5 @@ CKEDITOR_CONFIGS = {
         'tabSpaces': 4,
     },
 }
+
+DEFAULT_FILE_STORAGE = 'blog.storage.MyStorage'

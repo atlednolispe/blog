@@ -378,3 +378,99 @@ from ckeditor_uploader.widgets import CKEditorUploadingWidget
 class PostAdminForm(forms.ModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget(config_name='awesome_ckeditor'), label='内容')
     ...
+
+5.
+问题描述: CKEditor图片上传加水印
+
+解决方案:
+# blog/blog/settings/development.py
+...
+DEFAULT_FILE_STORAGE = 'blog.storage.MyStorage'
+
+# blog/blog/storage.py
+from django.core.files.storage import FileSystemStorage
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils.six import StringIO
+from PIL import Image, ImageDraw, ImageFont
+
+
+class MyStorage(FileSystemStorage):
+    font_path = '/Applications/Utilities/Console.app/Contents/Resources/Fonts/SFMono-Regular.otf'
+
+    def save(self, name, content, max_length=None):
+        if 'image' in content.content_type:
+            # 加水印
+            image = self.watermark_with_text(content, 'atlednolispe', 'green')
+            content = self.convert_image_to_file(image, name)
+
+        return super(MyStorage, self).save(name, content, max_length=max_length)
+
+    def convert_image_to_file(self, image, name):
+        temp = StringIO()
+        image.save(temp, format='PNG')
+        return InMemoryUploadedFile(temp, None, name, 'image/png', temp.len, None)
+
+    def watermark_with_text(self, file_obj, text, color, fontfamily=font_path):
+        image = Image.open(file_obj).convert('RGBA')
+        imageWatermark = Image.new('RGBA', image.size, (255, 255, 255, 0))
+
+        draw = ImageDraw.Draw(imageWatermark)
+        width, height = image.size
+        margin = 10
+        font = ImageFont.truetype(fontfamily, int(height / 20))
+        textWidth, textHeight = draw.textsize(text, font)
+        x = (width - textWidth - margin) / 2
+        y = height - textHeight - margin
+
+        draw.text((x, y), text, color, font)
+
+        return Image.alpha_composite(image, imageWatermark)
+
+6.
+问题描述: PIL处理水印失败
+
+解决方案:
+Internal Server Error: /upload/
+Traceback (most recent call last):
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/exception.py", line 35, in inner
+    response = get_response(request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 128, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 126, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/contrib/auth/decorators.py", line 21, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/views/decorators/csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/views/generic/base.py", line 69, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/views/generic/base.py", line 89, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/ckeditor_uploader/views.py", line 94, in post
+    saved_path = self._save_file(request, uploaded_file)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/ckeditor_uploader/views.py", line 132, in _save_file
+    saved_path = default_storage.save(filename, uploaded_file)
+  File "/Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/blog/storage.py", line 14, in save
+    content = self.convert_image_to_file(image, name)
+  File "/Users/atlednolispe/atlednolispe/Projects/PycharmProjects/blog/blog/storage.py", line 20, in convert_image_to_file
+    image.save(temp, format='PNG')
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/PIL/Image.py", line 1930, in save
+    save_handler(self, fp, filename)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/PIL/PngImagePlugin.py", line 731, in _save
+    fp.write(_MAGIC)
+TypeError: string argument expected, got 'bytes'
+[23/Feb/2018 21:16:36] "POST /upload/?CKEditor=id_content&CKEditorFuncNum=1&langCode=zh-cn HTTP/1.1" 500 109836
+
+原因: _MAGIC为b"\211PNG\r\n\032\n",是字节,应该将StringIO改为BytesIO
+
+解决方案:
+# blog/blog/storage.py
+from django.utils.six import BytesIO
+
+...
+class MyStorage(FileSystemStorage):
+    ...
+    def convert_image_to_file(self, image, name):
+        temp = BytesIO()
+        image.save(temp, format='PNG')
+        return InMemoryUploadedFile(temp, None, name, 'image/png', None, None)
