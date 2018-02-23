@@ -474,3 +474,5 @@ class MyStorage(FileSystemStorage):
         temp = BytesIO()
         image.save(temp, format='PNG')
         return InMemoryUploadedFile(temp, None, name, 'image/png', None, None)
+
+# TODO(atlednolispe) File is too large after adding watermark.
