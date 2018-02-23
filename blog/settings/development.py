@@ -34,6 +34,7 @@ TEMPLATES = [
             os.path.join(SITE_PACKAGES, 'xadmin/templates'),
             os.path.join(SITE_PACKAGES, 'crispy_forms/templates'),
             os.path.join(SITE_PACKAGES, 'reversion/templates'),
+            os.path.join(SITE_PACKAGES, 'ckeditor/templates'),
         ],
         'APP_DIRS': False,
         'OPTIONS': {
@@ -60,4 +61,12 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': '/tmp/django_cache',
     }
+}
+
+CKEDITOR_CONFIGS = {
+    'awesome_ckeditor': {  # set the name of the config
+        'toolbar': 'Full',
+        'height': 300,
+        # 'width': 1200,
+    },
 }

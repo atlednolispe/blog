@@ -1,3 +1,4 @@
+from ckeditor.fields import CKEditorWidget
 from dal import autocomplete
 from django import forms
 
@@ -5,7 +6,9 @@ from .models import Category, Tag
 
 
 class PostAdminForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorWidget(config_name='awesome_ckeditor'), label='内容')
     desc = forms.CharField(widget=forms.Textarea, label='摘要', required=False)
+
     category = forms.ModelChoiceField(
         queryset=Category.objects.all(),  # constraint
         widget=autocomplete.ModelSelect2(url='category-autocomplete'),

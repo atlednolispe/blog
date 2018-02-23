@@ -63,6 +63,8 @@ class Post(models.Model):
                 ],
                 extension_configs=config
             )
+        else:
+            self.content_html = self.content
 
         return super().save(*args, **kwargs)
 

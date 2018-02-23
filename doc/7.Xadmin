@@ -256,3 +256,48 @@ from .adminforms import PostAdminForm, TagAdminForm
 
 class PostAdmin(BaseOwnerAdmin):
     form = PostAdminForm
+
+4.
+问题描述: 增加富文本编辑器(CKEditor)
+
+解决方案:
+# blog/blog/settings/base.py
+INSTALLED_APPS = [
+    ...
+    'ckeditor',
+]
+
+# blog/blog/settings/development.py
+TEMPLATES = [
+    {
+        ...
+        'DIRS': [
+            ...
+            os.path.join(SITE_PACKAGES, 'ckeditor/templates'),
+        ],
+    }
+]
+
+CKEDITOR_CONFIGS = {
+    'awesome_ckeditor': {  # set the name of the config
+        'toolbar': 'Full',
+        'height': 300,
+        # 'width': 1200,
+    },
+}
+
+# blog/epsilon/adminforms.py
+from ckeditor.fields import CKEditorWidget
+
+
+class PostAdminForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorWidget(config_name='awesome_ckeditor'), label='内容')
+
+# blog/epsilon/models.py
+class Post(models.Model):
+    ...
+    def save(self, *args, **kwargs):
+        if self.is_markdown:
+            ...
+        else:
+            self.content_html = self.content
