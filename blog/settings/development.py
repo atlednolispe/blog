@@ -36,6 +36,7 @@ TEMPLATES = [
             os.path.join(SITE_PACKAGES, 'reversion/templates'),
             os.path.join(SITE_PACKAGES, 'ckeditor/templates'),
             os.path.join(SITE_PACKAGES, 'ckeditor_uploader/templates'),
+            os.path.join(SITE_PACKAGES, 'rest_framework/templates'),
         ],
         'APP_DIRS': False,
         'OPTIONS': {

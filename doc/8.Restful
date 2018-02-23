@@ -1,0 +1,71 @@
+1.
+问题描述: django实现restful接口
+
+解决方案:
+# blog/blog/base.py
+INSTALLED_APPS = [
+    ...
+    'rest_framework',
+]
+
+# blog/blog/settings/development.py
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            ...
+            os.path.join(SITE_PACKAGES, 'rest_framework/templates'),
+        ],
+    }
+]
+
+# blog/blog/urls.py
+from rest_framework import routers
+from rest_framework.documentation import include_docs_urls
+
+from epsilon.api import PostViewSet, CategoryViewSet
+
+
+router = routers.DefaultRouter()
+router.register(r'posts', PostViewSet)
+router.register(r'categories', CategoryViewSet)
+
+urlpatterns = (
+    [
+        ...
+        path('api/docs/', include_docs_urls(title='atlednolispe apis')),
+        path('api/', include(router.urls)),
+    ]
+)
+
+# blog/epsilon/api.py
+from rest_framework import serializers, viewsets
+
+from .models import Post, Category, Tag
+
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = (
+            'url', 'title', 'owner', 'desc',
+            'category', 'tags', 'created_time'
+        )
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+
+class CategorySerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            'url', 'name', 'created_time'
+        )
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
