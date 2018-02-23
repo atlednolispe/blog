@@ -7,10 +7,11 @@ from xadmin.layout import Fieldset, Row
 from blog.adminx import BaseOwnerAdmin
 
 from .models import Post, Category, Tag
-from .adminforms import TagAdminForm
+from .adminforms import PostAdminForm, TagAdminForm
 
 
 class PostAdmin(BaseOwnerAdmin):
+    form = PostAdminForm
     list_display = (
         'title', 'category', 'show_tags', 'status',
         'pv', 'uv', 'created_time', 'operator'

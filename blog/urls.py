@@ -18,8 +18,10 @@ import xadmin
 from django.urls import path, include
 from xadmin.plugins import xversion
 
-from epsilon.views import IndexView
 from blog import adminx
+from epsilon.views import IndexView
+
+from .autocomplete import CategoryAutocomplete, TagAutocomplete
 
 
 xadmin.autodiscover()
@@ -31,4 +33,6 @@ urlpatterns = [
     path('config/', include('config.urls')),
     path('comment/', include('comment.urls')),
     path('admin/', xadmin.site.urls),  # admin & custom_admin removed
+    path('category-autocomplete/', CategoryAutocomplete.as_view(), name='category-autocomplete'),
+    path('tag-autocomplete/', TagAutocomplete.as_view(), name='tag-autocomplete'),
 ]
