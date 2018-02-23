@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'dal_select2',
 
     'ckeditor',
+    'ckeditor_uploader',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -133,4 +134,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+# Removed to the development.py
+
+# TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+#
+# MEDIA_URL = '/media/'  # Absolute filesystem path to the directory that will hold user-uploaded files.
+#
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#
+# CKEDITOR_UPLOAD_PATH = 'article_images'

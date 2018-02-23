@@ -301,3 +301,80 @@ class Post(models.Model):
             ...
         else:
             self.content_html = self.content
+
+4.
+问题描述: CKEditor图片上传
+
+解决方案:
+# ref: django/contrib/staticfiles/urls.py
+
+# blog/blog/settings/base.py
+INSTALLED_APPS = [
+    ...
+    'ckeditor_uploader',
+]
+
+# blog/blog/settings/development.py
+TEMPLATES = [
+    {
+        ...
+        'DIRS': [
+            ...
+            os.path.join(SITE_PACKAGES, 'ckeditor_uploader/templates'),
+        ],
+    }
+]
+
+TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+
+MEDIA_URL = '/media/'  # Absolute filesystem path to the directory that will hold user-uploaded files.
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CKEDITOR_UPLOAD_PATH = 'article_images'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/tmp/django_cache',
+    }
+}
+
+CKEDITOR_CONFIGS = {
+    'awesome_ckeditor': {  # set the name of the config
+        'toolbar': 'Full',
+        'height': 300,
+        # 'width': 1200,
+        'tabSpaces': 4,
+    },
+}
+
+# blog/blog/urls.py
+from ckeditor_uploader import urls as ckeditor_uploader_urls
+from django.conf import settings
+from django.conf.urls.static import static  # collect staticfiles
+...
+
+
+urlpatterns = (
+    [
+        ...
+        path('category-autocomplete/', CategoryAutocomplete.as_view(), name='category-autocomplete'),
+        path('tag-autocomplete/', TagAutocomplete.as_view(), name='tag-autocomplete'),
+    ]
+    + ckeditor_uploader_urls.urlpatterns
+    + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+)  # url is likely to be deprecated in a future release.
+
+# blog/blog/adminforms.py
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
+...
+
+
+class PostAdminForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorUploadingWidget(config_name='awesome_ckeditor'), label='内容')
+    ...

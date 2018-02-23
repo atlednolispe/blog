@@ -35,6 +35,7 @@ TEMPLATES = [
             os.path.join(SITE_PACKAGES, 'crispy_forms/templates'),
             os.path.join(SITE_PACKAGES, 'reversion/templates'),
             os.path.join(SITE_PACKAGES, 'ckeditor/templates'),
+            os.path.join(SITE_PACKAGES, 'ckeditor_uploader/templates'),
         ],
         'APP_DIRS': False,
         'OPTIONS': {
@@ -52,6 +53,14 @@ TEMPLATES = [
     },
 ]
 
+TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+
+MEDIA_URL = '/media/'  # Absolute filesystem path to the directory that will hold user-uploaded files.
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CKEDITOR_UPLOAD_PATH = 'article_images'
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
@@ -68,5 +77,6 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'Full',
         'height': 300,
         # 'width': 1200,
+        'tabSpaces': 4,
     },
 }

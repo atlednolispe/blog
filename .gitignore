@@ -105,3 +105,6 @@ ENV/
 
 # IDEA Pycharm
 .idea/
+
+# Django
+media/
