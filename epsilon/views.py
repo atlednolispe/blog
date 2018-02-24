@@ -4,6 +4,7 @@ from django.core.cache import cache
 from django.views.generic import ListView, DetailView, TemplateView
 
 from blog.views import CommonMixin
+# from blog.test_util import time_it
 from comment.views import CommentShowMixin
 
 from .models import Post, Tag
@@ -25,6 +26,7 @@ class IndexView(TemplateView):
 
 
 class PostIndexView(BasePostView):
+    # @time_it
     def get_queryset(self):
         query = self.request.GET.get('query')
         # logger.info('query: [%s]', query)
