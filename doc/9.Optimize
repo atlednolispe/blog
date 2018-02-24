@@ -101,7 +101,7 @@ ps.print_stats()
 print(s.getvalue())
 
 3.
-问题描述: 对系统通过django-debug-toolbar进行性能检查
+问题描述: 对系统通过django-debug-toolbar进行性能检查(实时)
 
 解决方案:
 # blog/blog/settings/development.py
@@ -131,3 +131,51 @@ if settings.DEBUG:
     urlpatterns = [
         path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
+
+4.
+问题描述: 对系统通过django-silk进行性能检查(记录)
+
+解决方案:
+# blog/blog/settings/development.py
+INSTALLED_APPS += [
+    'silk',
+]
+
+MIDDLEWARE += [
+    'silk.middleware.SilkyMiddleware',
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            ...
+            os.path.join(SITE_PACKAGES, 'silk/templates'),
+        ]
+    }
+]
+
+SILKY_PYTHON_PROFILER = True
+
+# blog/blog/urls.py
+if settings.DEBUG:
+    ...
+    urlpatterns = [
+        path('silk/', include('silk.urls', namespace='silk'))
+    ] + urlpatterns
+
+# blog/blog/views.py
+from silk.profiling.profiler import silk_profile
+
+
+class CommonMixin:
+    @silk_profile(name='get_category_context')
+    def get_category_context(self):
+        categories = Category.objects.filter(status=1)  # filter '可用'
+        nav_cates = [cate for cate in categories if cate.is_nav]
+        none_nav_cates = [cate for cate in categories if not cate.is_nav]
+
+        return {
+            'nav_cates': nav_cates,
+            'none_nav_cates': none_nav_cates
+        }

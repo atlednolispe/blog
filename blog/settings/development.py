@@ -27,10 +27,12 @@ SITE_PACKAGES = [s_p for s_p in sys.path if s_p.endswith('site-packages')][0]
 
 INSTALLED_APPS += [
     'debug_toolbar',
+    'silk',
 ]
 
 MIDDLEWARE += [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
 INTERNAL_IPS = ['127.0.0.1']
@@ -47,6 +49,7 @@ TEMPLATES = [
             os.path.join(SITE_PACKAGES, 'ckeditor_uploader/templates'),
             os.path.join(SITE_PACKAGES, 'rest_framework/templates'),
             os.path.join(SITE_PACKAGES, 'debug_toolbar/templates'),
+            os.path.join(SITE_PACKAGES, 'silk/templates'),
         ],
         'APP_DIRS': False,
         'OPTIONS': {
@@ -94,3 +97,5 @@ CKEDITOR_CONFIGS = {
 }
 
 DEFAULT_FILE_STORAGE = 'blog.storage.MyStorage'
+
+SILKY_PYTHON_PROFILER = True
