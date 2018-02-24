@@ -23,7 +23,7 @@ from rest_framework.documentation import include_docs_urls
 from xadmin.plugins import xversion
 
 from blog import adminx
-from epsilon.api import PostViewSet, CategoryViewSet
+from epsilon.api import PostViewSet, CategoryViewSet, TagViewSet, UserViewSet
 from epsilon.views import IndexView
 
 from .autocomplete import CategoryAutocomplete, TagAutocomplete
@@ -32,9 +32,12 @@ from .autocomplete import CategoryAutocomplete, TagAutocomplete
 xadmin.autodiscover()
 xversion.register_models()  # revision & widget
 
+
 router = routers.DefaultRouter()
-router.register(r'posts', PostViewSet)
-router.register(r'categories', CategoryViewSet)
+router.register(r'post', PostViewSet)
+router.register(r'category', CategoryViewSet)
+router.register(r'tag', TagViewSet)
+router.register(r'user', UserViewSet)
 
 
 urlpatterns = (

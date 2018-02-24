@@ -69,3 +69,305 @@ class CategorySerializer(serializers.HyperlinkedModelSerializer):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+2.
+问题描述: api接口无法正确获取数据
+
+Internal Server Error: /api/posts/
+Traceback (most recent call last):
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/relations.py", line 376, in to_representation
+    url = self.get_url(value, self.view_name, request, format)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/relations.py", line 314, in get_url
+    return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/reverse.py", line 50, in reverse
+    url = _reverse(viewname, args, kwargs, request, format, **extra)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/reverse.py", line 63, in _reverse
+    url = django_reverse(viewname, args=args, kwargs=kwargs, **extra)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/urls/base.py", line 88, in reverse
+    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/urls/resolvers.py", line 632, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'user-detail' not found. 'user-detail' is not a valid view function or pattern name.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/exception.py", line 35, in inner
+    response = get_response(request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 128, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/core/handlers/base.py", line 126, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/django/views/decorators/csrf.py", line 54, in wrapped_view
+    return view_func(*args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/viewsets.py", line 95, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/views.py", line 494, in dispatch
+    response = self.handle_exception(exc)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/views.py", line 454, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/views.py", line 491, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/mixins.py", line 48, in list
+    return Response(serializer.data)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/serializers.py", line 742, in data
+    ret = super(ListSerializer, self).data
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/serializers.py", line 262, in data
+    self._data = self.to_representation(self.instance)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/serializers.py", line 660, in to_representation
+    self.child.to_representation(item) for item in iterable
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/serializers.py", line 660, in <listcomp>
+    self.child.to_representation(item) for item in iterable
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/serializers.py", line 504, in to_representation
+    ret[field.field_name] = field.to_representation(attribute)
+  File "/Users/atlednolispe/.virtualenvs/django20/lib/python3.6/site-packages/rest_framework/relations.py", line 391, in to_representation
+    raise ImproperlyConfigured(msg % self.view_name)
+django.core.exceptions.ImproperlyConfigured: Could not resolve URL for hyperlinked relationship using view name "user-detail". You may have failed to include the related model in your API, or incorrectly configured the `lookup_field` attribute on this field.
+[23/Feb/2018 23:01:59] "GET /api/posts/ HTTP/1.1" 500 151580
+
+原因:
+serializers.HyperlinkedModelSerializer -> serializers.ModelSerializer。
+HyperlinkedModelSerializer需要额外配置,"category": "http://127.0.0.1:8000/api/category/1/"之类外键的展示需要在api中先注册category才能正确显示,
+或者使用ModelSerializer显示外键的id,"category": "id": 2。
+
+解决方案:
+# blog/epsilon/api.py
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            'url', 'id', 'name', 'created_time'
+        )
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = (
+            'url', 'id', 'name', 'created_time'
+        )
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'url', 'id', 'username', 'date_joined'
+        )
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+3.
+问题描述: rest framework api配置
+
+解决方案:
+# blog/blog/settings/base.py
+STATICFILES_DIRS = [
+    ...
+    os.path.join(SITE_PACKAGES, 'rest_framework/static'),
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',  # PageNumberPagination ?page=#
+    'PAGE_SIZE': 5,
+}
+
+# blog/blog/urls.py
+from epsilon.api import PostViewSet, CategoryViewSet, TagViewSet, UserViewSet
+
+
+router = routers.DefaultRouter()
+router.register(r'post', PostViewSet)
+router.register(r'category', CategoryViewSet)
+router.register(r'tag', TagViewSet)
+router.register(r'user', UserViewSet)
+
+# blog/epsilon/api.py
+from django.contrib.auth.models import User
+from rest_framework import serializers, viewsets
+
+from .models import Post, Category, Tag
+
+
+class PostSerializer(serializers.HyperlinkedModelSerializer):
+    category = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )
+
+    tags = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='name'
+    )
+
+    owner = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
+
+    class Meta:
+        model = Post
+        fields = (
+            'url', 'id', 'title', 'owner',
+            'category', 'tags', 'desc', 'pv',
+            'uv', 'created_time'
+        )
+
+
+class PostDetailSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='name'
+    )
+
+    tags = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='name'
+    )
+
+    owner = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='username'
+    )
+
+    class Meta:
+        model = Post
+        fields = (
+            'url', 'id', 'title', 'owner',
+            'category', 'tags', 'desc', 'pv',
+            'uv', 'status', 'is_markdown', 'created_time',
+            'update_time', 'content_html'
+        )
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class = PostDetailSerializer
+        return super().retrieve(request, *args, **kwargs)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            'url', 'id', 'name', 'created_time'
+        )
+
+
+class CategoryDetailSerializer(serializers.ModelSerializer):
+    post_set = PostSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = Category
+        fields = (
+            'id', 'name', 'created_time',
+            'post_set',
+        )
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class = CategoryDetailSerializer
+        return super().retrieve(request, *args, **kwargs)
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = (
+            'url', 'id', 'name', 'created_time',
+        )
+
+
+class TagDetailSerializer(serializers.ModelSerializer):
+    post_set = PostSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = Tag
+        fields = (
+            'id', 'name', 'created_time',
+            'post_set',
+        )
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class = TagDetailSerializer
+        return super().retrieve(request, *args, **kwargs)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'url', 'id', 'username', 'date_joined',
+        )
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    post_set = PostSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'username', 'date_joined',
+            'post_set',
+        )
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class = UserDetailSerializer
+        return super().retrieve(request, *args, **kwargs)
+
+
+4.
+问题描述: 抽象api.py中的分类以及详情 以及分类后的分页
+
+解决方案:
+# TODO(atlednolispe)
+
+5.
+问题描述: bootstrap加载css地图失败
+
+[24/Feb/2018 13:06:44] "GET /static/rest_framework/css/bootstrap.min.css.map HTTP/1.1" 404 1744
+
+解决方案:
+删除rest_framework/static/rest_framework/css/bootstrap.min.css的最后一行
+/*# sourceMappingURL=bootstrap.min.css.map */
