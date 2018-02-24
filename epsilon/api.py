@@ -67,13 +67,6 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        category_id = self.request.GET.get('category')
-        if category_id:
-            qs = qs.filter(category_id=category_id)  # /api/category/?category=1
-        return qs
-
     def retrieve(self, request, *args, **kwargs):
         self.serializer_class = PostDetailSerializer
         return super().retrieve(request, *args, **kwargs)
@@ -88,10 +81,18 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CategoryDetailSerializer(serializers.ModelSerializer):
-    post_set = PostSerializer(
-        many=True,
-        read_only=True,
-    )
+    post_set = serializers.SerializerMethodField('paginated_posts')
+
+    def paginated_posts(self, obj):
+        posts = obj.post_set.all().order_by('-id')
+        paginator = pagination.PageNumberPagination()
+        page = paginator.paginate_queryset(posts, self.context['request'])
+        serializer = PostSerializer(page, many=True, context={'request': self.context['request']})
+        return {
+            'results': serializer.data,
+            'previous_page': paginator.get_previous_link(),
+            'next_page': paginator.get_next_link(),
+        }
 
     class Meta:
         model = Category
@@ -158,10 +159,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    post_set = PostSerializer(
-        many=True,
-        read_only=True,
-    )
+    post_set = serializers.SerializerMethodField('paginated_posts')
+
+    def paginated_posts(self, obj):
+        posts = obj.post_set.all().order_by('-id')
+        paginator = pagination.PageNumberPagination()
+        page = paginator.paginate_queryset(posts, self.context['request'])
+        serializer = PostSerializer(page, many=True, context={'request': self.context['request']})
+        return {
+            'results': serializer.data,
+            'previous_page': paginator.get_previous_link(),
+            'next_page': paginator.get_next_link(),
+        }
 
     class Meta:
         model = User
