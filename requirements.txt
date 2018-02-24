@@ -9,6 +9,7 @@ Django==2.0.2
 django-autocomplete-light==3.2.10
 django-ckeditor==5.4.0
 django-crispy-forms==1.7.0
+django-debug-toolbar==1.9.1
 django-formtools==2.1
 django-import-export==1.0.0
 django-js-asset==1.0.0
@@ -42,6 +43,7 @@ PyYAML==3.12
 requests==2.18.4
 simplegeneric==0.8.1
 six==1.11.0
+sqlparse==0.2.4
 tablib==0.12.1
 traitlets==4.3.2
 unicodecsv==0.14.1

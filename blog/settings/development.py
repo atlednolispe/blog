@@ -25,6 +25,15 @@ THEME = os.path.join(THEME_DIR, THEME_TYPE)
 
 SITE_PACKAGES = [s_p for s_p in sys.path if s_p.endswith('site-packages')][0]
 
+INSTALLED_APPS += [
+    'debug_toolbar',
+]
+
+MIDDLEWARE += [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
+
+INTERNAL_IPS = ['127.0.0.1']
 
 TEMPLATES = [
     {
@@ -37,6 +46,7 @@ TEMPLATES = [
             os.path.join(SITE_PACKAGES, 'ckeditor/templates'),
             os.path.join(SITE_PACKAGES, 'ckeditor_uploader/templates'),
             os.path.join(SITE_PACKAGES, 'rest_framework/templates'),
+            os.path.join(SITE_PACKAGES, 'debug_toolbar/templates'),
         ],
         'APP_DIRS': False,
         'OPTIONS': {

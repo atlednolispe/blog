@@ -99,3 +99,35 @@ sortby = 'tottime'
 ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
 ps.print_stats()
 print(s.getvalue())
+
+3.
+问题描述: 对系统通过django-debug-toolbar进行性能检查
+
+解决方案:
+# blog/blog/settings/development.py
+INSTALLED_APPS += [
+    'debug_toolbar',
+]
+
+MIDDLEWARE += [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
+
+INTERNAL_IPS = ['127.0.0.1']
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            ...
+            os.path.join(SITE_PACKAGES, 'debug_toolbar/templates'),
+        ]
+    }
+]
+
+# blog/blog/urls.py
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
