@@ -150,3 +150,38 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # PageNumberPagination ?page=#
     'PAGE_SIZE': 5,
 }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'brief': {
+            'format': '%(asctime)s %(levelname)-8s %(name)-15s %(message)s'
+        }
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.dirname(BASE_DIR) + '/log/debug.log',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'formatter': 'brief',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.dirname(BASE_DIR) + '/log/debug.log',
+        }
+    },
+    'loggers': {
+        '': {  # root
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,  # propagate to root if True
+        },
+    },
+}

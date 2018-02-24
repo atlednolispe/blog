@@ -1,3 +1,5 @@
+import logging
+
 from django.core.cache import cache
 from django.views.generic import ListView, DetailView, TemplateView
 
@@ -5,6 +7,9 @@ from blog.views import CommonMixin
 from comment.views import CommentShowMixin
 
 from .models import Post, Tag
+
+
+logger = logging.getLogger(__name__)
 
 
 class BasePostView(CommonMixin, ListView):
@@ -22,10 +27,12 @@ class IndexView(TemplateView):
 class PostIndexView(BasePostView):
     def get_queryset(self):
         query = self.request.GET.get('query')
+        # logger.info('query: [%s]', query)
         qs = BasePostView.get_queryset(self)
 
         if query:
             qs = qs.filter(title__icontains=query)
+        # logger.debug('query result: [%s]', qs)
         return qs
 
     def get_context_data(self, **kwargs):
