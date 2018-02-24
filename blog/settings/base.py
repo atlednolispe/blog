@@ -147,6 +147,6 @@ STATIC_URL = '/static/'
 # CKEDITOR_UPLOAD_PATH = 'article_images'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',  # PageNumberPagination ?page=#
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # PageNumberPagination ?page=#
     'PAGE_SIZE': 5,
 }

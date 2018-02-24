@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework import serializers, viewsets
+from rest_framework import serializers, viewsets, pagination
 
 from .models import Post, Category, Tag
 
@@ -20,6 +20,8 @@ class PostSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True,
         slug_field='username'
     )
+
+    created_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
 
     class Meta:
         model = Post
@@ -47,6 +49,10 @@ class PostDetailSerializer(serializers.ModelSerializer):
         slug_field='username'
     )
 
+    created_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+
+    update_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+
     class Meta:
         model = Post
         fields = (
@@ -60,6 +66,13 @@ class PostDetailSerializer(serializers.ModelSerializer):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        category_id = self.request.GET.get('category')
+        if category_id:
+            qs = qs.filter(category_id=category_id)  # /api/category/?category=1
+        return qs
 
     def retrieve(self, request, *args, **kwargs):
         self.serializer_class = PostDetailSerializer
@@ -106,10 +119,18 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class TagDetailSerializer(serializers.ModelSerializer):
-    post_set = PostSerializer(
-        many=True,
-        read_only=True,
-    )
+    post_set = serializers.SerializerMethodField('paginated_posts')
+
+    def paginated_posts(self, obj):  # default: def get_post_set(self, obj)
+        posts = obj.post_set.all().order_by('-id')
+        paginator = pagination.PageNumberPagination()
+        page = paginator.paginate_queryset(posts, self.context['request'])
+        serializer = PostSerializer(page, many=True, context={'request': self.context['request']})
+        return {
+            'results': serializer.data,
+            'previous_page': paginator.get_previous_link(),
+            'next_page': paginator.get_next_link(),
+        }
 
     class Meta:
         model = Tag
