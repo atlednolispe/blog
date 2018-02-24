@@ -64,7 +64,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('-id')
     serializer_class = PostSerializer
 
     def retrieve(self, request, *args, **kwargs):
@@ -103,7 +103,7 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('-id')
     serializer_class = CategorySerializer
 
     def retrieve(self, request, *args, **kwargs):
@@ -142,7 +142,7 @@ class TagDetailSerializer(serializers.ModelSerializer):
 
 
 class TagViewSet(viewsets.ModelViewSet):
-    queryset = Tag.objects.all()
+    queryset = Tag.objects.all().order_by('-id')
     serializer_class = TagSerializer
 
     def retrieve(self, request, *args, **kwargs):
@@ -181,7 +181,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('-id')
     serializer_class = UserSerializer
 
     def retrieve(self, request, *args, **kwargs):
