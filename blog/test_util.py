@@ -12,7 +12,7 @@ def cache_it(seconds):
             key = repr((func.__name__, args, kwargs))
             result = cache.get(key)
             if not result:
-                print("%s haven't cached!" % func.__name__)
+                print("%s - %s haven't cached!" % (self, func.__name__))
                 result = func(self, *args, **kwargs)
                 cache.set(key, result, seconds)
 

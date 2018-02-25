@@ -8,9 +8,9 @@
 问题描述: 数据库迁移
 
 解决方案:
-(django20) mayangbindeMBP:blog mayangbin$ python3 manage.py migrate
-(django20) mayangbindeMBP:blog mayangbin$ python3 manage.py collectstatic
-(django20) mayangbindeMBP:blog mayangbin$ python3 manage.py createsuperuser
+(django20) atlednolispedeMBP:blog atlednolispe$ python3 manage.py migrate
+(django20) atlednolispedeMBP:blog atlednolispe$ python3 manage.py collectstatic
+(django20) atlednolispedeMBP:blog atlednolispe$ python3 manage.py createsuperuser
 
 # blog/blog/settings/product.py
 import sys
@@ -160,7 +160,7 @@ def static(prefix, view=serve, **kwargs):
 
 
 解决方案:
-(django20) mayangbindeMBP:blog mayangbin$ python3 manage.py collectstatic
+(django20) atlednolispedeMBP:blog atlednolispe$ python3 manage.py collectstatic
 # blog/blog/urls.py
 import re
 
@@ -196,6 +196,12 @@ $ make
 # 启动redis
 root@aliyun: redis-4.0.8# cd src
 root@aliyun: src# ./redis-server &
+
+# 清空redis
+root@aliyun: src# ./redis-cli
+127.0.0.1:6379> flushall
+27695:M 25 Feb 18:22:09.206 * DB saved on disk
+OK
 
 # blog/blog/settings/product.py
 CACHES = {
