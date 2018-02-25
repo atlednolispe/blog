@@ -1,0 +1,63 @@
+1.
+问题描述: 部署项目上线
+
+解决方案:
+(1) 获取代码
+1. tar + scp
+2. git push + pull
+3. pypi server
+4. docker
+
+2.
+问题描述: 项目打包
+
+解决方案:
+PyPI:
+# blog/setup.py
+from setuptools import setup, find_packages
+
+# blog.egg-info/ is the information of packaging in python, need to be deleted if modify setup.py
+setup(
+    name='blog',
+    version='0.1',
+    description="atlednolispe's simple blog established on django2.0.",
+    author='atlednolispe',
+    author_email='atlednolispe@gmail.com',
+    url='http://www.mayangbin.com',
+    packages=find_packages('../blog'),  # (python3 blog/setup.py sdist)'s pwd/../blog to find
+    include_package_data=True,  # 配置MANIFEST.in文件 + packages=find_packages('../blog'),
+    install_requires=[
+        ...
+        'Django==2.0.2',
+        ...
+    ],
+    scripts=[
+        'manage.py',
+    ],
+)
+
+# blog/MANIFEST.in
+graft doc
+graft media
+graft static
+graft templates
+
+include .gitignore LICENSE README* requirements.txt
+
+
+# ref: MANIFEST.in
+https://docs.python.org/2/distutils/sourcedist.html#the-manifest-in-template
+
+# only package python packages + setup.py + scripts
+# source
+(django20) atlednolispedeMBP:blog atlednolispe$ python3 setup.py sdist
+# or binary
+(django20) atlednolispedeMBP:blog atlednolispe$ pip3 install wheel
+(django20) atlednolispedeMBP:blog atlednolispe$ python3 setup.py bdist_wheel
+
+
+3.
+创建虚拟环境:
+root@aliyun: ~# python3 -m venv ~/.virtualenvs/django20
+root@aliyun: ~# source ~/.virtualenvs/django20/bin/activate
+(django20) root@aliyun: ~#

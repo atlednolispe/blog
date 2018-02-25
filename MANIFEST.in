@@ -1,0 +1,6 @@
+graft doc
+graft media
+graft static
+graft templates
+
+include .gitignore LICENSE README* requirements.txt
