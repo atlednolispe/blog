@@ -58,9 +58,13 @@ STATICFILES_DIRS = [
 ]
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/tmp/django_cache',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PARSER_CLASS": "redis.connection.HiredisParser",
+        }
     }
 }
 
@@ -92,7 +96,7 @@ if DEBUG:
         'silk.middleware.SilkyMiddleware',
     ]
 
-    INTERNAL_IPS = ['127.0.0.1']
+    INTERNAL_IPS = ['127.0.0.1']  # debug-toolbar
 
     SILKY_PYTHON_PROFILER = True
 else:

@@ -180,3 +180,76 @@ urlpatterns = (
     + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 )
+
+4.
+问题描述:  配置redis缓存
+
+解决方案:
+# redis安装
+# ref: https://redis.io/download
+
+$ wget http://download.redis.io/releases/redis-4.0.8.tar.gz
+$ tar xzf redis-4.0.8.tar.gz
+$ cd redis-4.0.8
+$ make
+
+# 启动redis
+root@aliyun: redis-4.0.8# cd src
+root@aliyun: src# ./redis-server &
+
+# blog/blog/settings/product.py
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PARSER_CLASS": "redis.connection.HiredisParser",
+        }
+    }
+}
+
+# blog/blog/test_util.py
+def cache_it(seconds):
+    def decorator(func):
+        def wrapper(self, *args, **kwargs):  # wrapper's first argument is a concrete instace, always different.
+            key = repr((func.__name__, args, kwargs))
+            result = cache.get(key)
+            if not result:
+                print("%s haven't cached!" % func.__name__)
+                result = func(self, *args, **kwargs)
+                cache.set(key, result, seconds)
+
+            return result
+        return wrapper
+    return decorator
+
+# blog/blog/views.py
+from blog.test_util import cache_it
+
+class CommonMixin:
+    @cache_it(60 * 5)
+    def get_category_context(self):
+        pass
+
+# blog/epsilon/views.py
+class CommonMixin:
+    # @silk_profile(name='get_category_context')
+    @cache_it(60 * 5)
+    def get_category_context(self):
+        pass
+
+# blog/epsilon/urls.py
+from django.views.decorators.cache import cache_page
+
+app_name = 'epsilon'
+urlpatterns = [
+    path('', cache_page(60 * 10)(PostIndexView.as_view()), name='index'),
+    ...
+]
+
+5.
+问题描述:  远程redis以及密码设置
+
+解决方案:
+# TODO(atlednolispe) To be finished.

@@ -1,5 +1,6 @@
 # from silk.profiling.profiler import silk_profile
 
+from blog.test_util import cache_it
 from comment.models import Comment
 from config.models import SideBar
 from epsilon.models import Post, Category
@@ -7,6 +8,7 @@ from epsilon.models import Post, Category
 
 class CommonMixin:
     # @silk_profile(name='get_category_context')
+    @cache_it(60 * 5)
     def get_category_context(self):
         categories = Category.objects.filter(status=1)  # filter '可用'
         nav_cates = [cate for cate in categories if cate.is_nav]
