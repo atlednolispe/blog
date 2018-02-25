@@ -1,4 +1,4 @@
-import logging
+# import logging
 
 from django.core.cache import cache
 from django.views.generic import ListView, DetailView, TemplateView
@@ -10,7 +10,7 @@ from comment.views import CommentShowMixin
 from .models import Post, Tag
 
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 class BasePostView(CommonMixin, ListView):

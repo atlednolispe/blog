@@ -108,3 +108,9 @@ ENV/
 
 # Django
 media/
+
+# private
+atlednolispe_*
+
+# static_files collected by django
+static_files/

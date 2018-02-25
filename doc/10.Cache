@@ -1,0 +1,182 @@
+1.
+问题描述: MariaDB安装
+
+解决方案:
+# TODO(atlednolispe) zhihu.
+
+2.
+问题描述: 数据库迁移
+
+解决方案:
+(django20) mayangbindeMBP:blog mayangbin$ python3 manage.py migrate
+(django20) mayangbindeMBP:blog mayangbin$ python3 manage.py collectstatic
+(django20) mayangbindeMBP:blog mayangbin$ python3 manage.py createsuperuser
+
+# blog/blog/settings/product.py
+import sys
+
+import atlednolispe_settings  # private_password
+
+from .base import *
+
+BASE_DIR = os.path.dirname(BASE_DIR)  # make BASEDIR = blog/ not blog/blog/
+
+DEBUG = False
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': atlednolispe_settings.DATABASE_NAME,
+        'USER': atlednolispe_settings.USER,
+        'PASSWORD': atlednolispe_settings.PASSWORD,
+        'HOST': atlednolispe_settings.HOST,
+        'PORT': '3306',
+    }
+}
+
+THEME_DIR = 'themes'
+THEME_TYPE = 'html5up'
+THEME = os.path.join(THEME_DIR, THEME_TYPE)
+
+SITE_PACKAGES = [s_p for s_p in sys.path if s_p.endswith('site-packages')][0]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates', THEME),
+            os.path.join(SITE_PACKAGES, 'xadmin/templates'),
+            os.path.join(SITE_PACKAGES, 'crispy_forms/templates'),
+            os.path.join(SITE_PACKAGES, 'reversion/templates'),
+            os.path.join(SITE_PACKAGES, 'ckeditor/templates'),
+            os.path.join(SITE_PACKAGES, 'ckeditor_uploader/templates'),
+            os.path.join(SITE_PACKAGES, 'rest_framework/templates'),
+        ],
+        'APP_DIRS': False,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+
+            'libraries': {
+                'filters': 'templatetags.filters'
+            }
+        },
+    },
+]
+
+TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+
+MEDIA_URL = '/media/'  # Absolute filesystem path to the directory that will hold user-uploaded files.
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CKEDITOR_UPLOAD_PATH = 'article_images'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(SITE_PACKAGES, 'rest_framework/static'),
+]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/tmp/django_cache',
+    }
+}
+
+CKEDITOR_CONFIGS = {
+    'awesome_ckeditor': {  # set the name of the config
+        'toolbar': 'Full',
+        'height': 300,
+        # 'width': 1200,
+        'tabSpaces': 4,
+    },
+}
+
+DEFAULT_FILE_STORAGE = 'blog.storage.MyStorage'
+
+ALLOWED_HOSTS = [  # required if DEBUG = False
+    '127.0.0.1',
+]
+
+# blog/blog/settings/base.py
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static_files')
+
+# blog/blog/urls.py
+import re
+
+from django.urls import re_path
+from django.views.static import serve
+
+from atlednolispe_settings import ADMIN_URL
+
+def static(prefix, **kwargs):  # override static
+    return [
+        re_path(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), serve, kwargs=kwargs),
+    ]
+
+urlpatterns = (
+    [
+        ...
+        path(ADMIN_URL, xadmin.site.urls),  # admin & custom_admin removed
+    ]
+    + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+)
+
+# blog/manage.py
+if __name__ == "__main__":
+    profile = os.environ.get('BLOG_PROFILE', 'product')
+
+3.
+问题描述: DEBUG = False模式下static文件无法访问
+
+原因:
+1. 需要配置STATIC_ROOT,并且执行python3 manage.py collectstatic收集
+2. django/conf/urls/static.py中的处理静态文件的函数只在DEBUG模式下有效,需要改写
+def static(prefix, view=serve, **kwargs):
+    """
+    Return a URL pattern for serving files in debug mode.
+
+    from django.conf import settings
+    from django.conf.urls.static import static
+
+    urlpatterns = [
+        # ... the rest of your URLconf goes here ...
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    """
+    if not prefix:
+        raise ImproperlyConfigured("Empty static prefix not permitted")
+    elif not settings.DEBUG or '://' in prefix:
+        # No-op if not in debug mode or a non-local prefix.
+        return []
+    return [
+        re_path(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), view, kwargs=kwargs),
+    ]
+
+
+解决方案:
+(django20) mayangbindeMBP:blog mayangbin$ python3 manage.py collectstatic
+# blog/blog/urls.py
+import re
+
+from django.urls import re_path
+from django.views.static import serve
+
+
+def static(prefix, **kwargs):  # override static
+    return [
+        re_path(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), serve, kwargs=kwargs),
+    ]
+
+urlpatterns = (
+    [
+        ...
+    ]
+    + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+)

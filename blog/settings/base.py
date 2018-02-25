@@ -136,6 +136,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static_files')
+# STATIC_ROOT = '../../static_files/'  # 执行python manage.py 的../../不是当前文件的../../
+
 # Removed to the development.py
 
 # TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
@@ -151,37 +154,38 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
 }
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'brief': {
-            'format': '%(asctime)s %(levelname)-8s %(name)-15s %(message)s'
-        }
-    },
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.dirname(BASE_DIR) + '/log/debug.log',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'formatter': 'brief',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.dirname(BASE_DIR) + '/log/debug.log',
-        }
-    },
-    'loggers': {
-        '': {  # root
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,  # propagate to root if True
-        },
-    },
-}
+# debug info missing if not commented
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'formatters': {
+#         'brief': {
+#             'format': '%(asctime)s %(levelname)-8s %(name)-15s %(message)s'
+#         }
+#     },
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'filename': os.path.dirname(BASE_DIR) + '/log/debug.log',
+#         },
+#         'console': {
+#             'level': 'DEBUG',
+#             'formatter': 'brief',
+#             'class': 'logging.handlers.RotatingFileHandler',
+#             'filename': os.path.dirname(BASE_DIR) + '/log/debug.log',
+#         }
+#     },
+#     'loggers': {
+#         '': {  # root
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': True,
+#         },
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'INFO',
+#             'propagate': False,  # propagate to root if True
+#         },
+#     },
+# }
