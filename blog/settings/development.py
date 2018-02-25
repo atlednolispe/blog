@@ -67,14 +67,6 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
-
-MEDIA_URL = '/media/'  # Absolute filesystem path to the directory that will hold user-uploaded files.
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-CKEDITOR_UPLOAD_PATH = 'article_images'
-
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
     os.path.join(SITE_PACKAGES, 'rest_framework/static'),

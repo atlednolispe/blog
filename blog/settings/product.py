@@ -4,8 +4,6 @@ import atlednolispe_settings  # private_password
 
 from .base import *
 
-BASE_DIR = os.path.dirname(BASE_DIR)  # make BASEDIR = blog/ not blog/blog/
-
 DEBUG = False
 
 DATABASES = {
@@ -52,14 +50,6 @@ TEMPLATES = [
         },
     },
 ]
-
-TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
-
-MEDIA_URL = '/media/'  # Absolute filesystem path to the directory that will hold user-uploaded files.
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-CKEDITOR_UPLOAD_PATH = 'article_images'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),

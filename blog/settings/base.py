@@ -14,6 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(BASE_DIR)  # make BASEDIR = blog/ not blog/blog/
 
 
 # Quick-start development settings - unsuitable for production
@@ -136,18 +137,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static_files')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_files')
 # STATIC_ROOT = '../../static_files/'  # 执行python manage.py 的../../不是当前文件的../../
 
 # Removed to the development.py
 
-# TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
-#
-# MEDIA_URL = '/media/'  # Absolute filesystem path to the directory that will hold user-uploaded files.
-#
-# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-#
-# CKEDITOR_UPLOAD_PATH = 'article_images'
+TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+
+MEDIA_URL = '/media/'  # Absolute filesystem path to the directory that will hold user-uploaded files.
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CKEDITOR_UPLOAD_PATH = 'article_images'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',  # PageNumberPagination ?page=#
@@ -167,13 +168,13 @@ REST_FRAMEWORK = {
 #         'file': {
 #             'level': 'DEBUG',
 #             'class': 'logging.FileHandler',
-#             'filename': os.path.dirname(BASE_DIR) + '/log/debug.log',
+#             'filename': BASE_DIR + '/log/debug.log',
 #         },
 #         'console': {
 #             'level': 'DEBUG',
 #             'formatter': 'brief',
 #             'class': 'logging.handlers.RotatingFileHandler',
-#             'filename': os.path.dirname(BASE_DIR) + '/log/debug.log',
+#             'filename': BASE_DIR + '/log/debug.log',
 #         }
 #     },
 #     'loggers': {
