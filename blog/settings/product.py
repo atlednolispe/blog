@@ -14,6 +14,7 @@ DATABASES = {
         'PASSWORD': atlednolispe_settings.PASSWORD,
         'HOST': atlednolispe_settings.HOST,
         'PORT': '3306',
+        'CONN_MAX_AGE': 60,  # like connect pool
     }
 }
 
@@ -74,6 +75,27 @@ CKEDITOR_CONFIGS = {
 
 DEFAULT_FILE_STORAGE = 'blog.storage.MyStorage'
 
-ALLOWED_HOSTS = [  # required if DEBUG = False
-    '127.0.0.1',
-]
+# django-debug-toolbar & silk
+if DEBUG:
+    TEMPLATES[0]['DIRS'] += [
+        os.path.join(SITE_PACKAGES, 'debug_toolbar/templates'),
+        os.path.join(SITE_PACKAGES, 'silk/templates'),
+    ]
+
+    INSTALLED_APPS += [
+        'debug_toolbar',
+        'silk',
+    ]
+
+    MIDDLEWARE += [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+        'silk.middleware.SilkyMiddleware',
+    ]
+
+    INTERNAL_IPS = ['127.0.0.1']
+
+    SILKY_PYTHON_PROFILER = True
+else:
+    ALLOWED_HOSTS = [  # required if DEBUG = False
+        '127.0.0.1',
+    ]
