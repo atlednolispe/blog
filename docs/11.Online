@@ -57,7 +57,80 @@ https://docs.python.org/2/distutils/sourcedist.html#the-manifest-in-template
 
 
 3.
-创建虚拟环境:
+问题描述: 创建虚拟环境
+
+解决方案:
 root@aliyun: ~# python3 -m venv ~/.virtualenvs/django20
 root@aliyun: ~# source ~/.virtualenvs/django20/bin/activate
 (django20) root@aliyun: ~#
+
+root@aliyun: ~# pip install virtualenv
+root@aliyun: ~# cd ~/.virtualenvs/
+root@aliyun: .virtualenvs# virtualenv pypi
+root@aliyun: ~# source ~/.virtualenvs/pypi/bin/activate
+(pypi) root@aliyun: ~# pip install pypi-server
+
+# 一个巨坑,现在版本的peewee文件结构改变了,会导致报错
+(pypi) root@aliyun: ~# pip uninstall peewee
+(pypi) root@aliyun: ~# pip install peewee==2.10.2
+
+(pypi) root@aliyun: Downloads# pypi-server
+
+# 我的阿里云报错超时,可以在下面这个文件中修改超时设置
+(pypi) root@aliyun: pypi# vim /root/.virtualenvs/pypi/lib/python2.7/site-packages/tornado/httpclient.py
+
+# 研究了半天这个pypi-server虚拟机上可用但在我的阿里云上并不能正常使用,最终我转向官网的pypiserver(支持python3)
+# ref: https://pypi.python.org/pypi/pypiserver#quickstart-installation-and-usage
+
+(pypi) root@aliyun: pypi# pip install pypiserver
+
+(pypi) root@aliyun: pypi# pip install passlib
+
+(pypi) root@aliyun: pypi# htpasswd -sc htpasswd.txt atlednolispe
+
+(pypi) root@aliyun: pypi# pypi-server -p 8080 -P htpasswd.txt ~/pypi/packages &
+
+# 关闭防火墙
+(pypi) root@aliyun: packages# firewall-cmd --permanent --zone=public --add-port=8080/tcp
+
+(pypi) root@aliyun: packages# systemctl restart firewalld
+
+(pypi) root@aliyun: packages# vim ~/.pypirc
+# 在local里面配置自己的服务器
+# 在pypi里面加repository无效好像默认到https://upload.pypi.org/legacy/
+[distutils]
+index-servers =
+  pypi
+  local
+
+[pypi]
+username:<your_pypi_username>
+password:<your_pypi_passwd>
+
+[local]
+repository: http://localhost:8080
+username: <some_username>
+password: <some_passwd>
+
+atlednolispedeMacBook-Pro:upload atlednolispe$ python3 setup.py sdist upload -r local
+
+# 从pypi安装package
+(pypi) root@aliyun: packages# pip install django --no-index --find-links=http://<your_ip>:8080/packages/ --trusted-host <your_ip>
+
+4.
+问题描述: pypi-server无法使用python3安装
+
+解决方案:
+# 需要python2
+# futures requires Python '>=2.6, <3' but the running Python is 3.6.3
+root@aliyun: ~# pip install pypi-server
+
+5.
+问题描述: pip的安装
+
+解决方案:
+# 可能需要epel
+root@aliyun: ~# yum -y install epel-release
+
+root@aliyun: ~# yum install python-pip
+root@aliyun: ~# pip install -U pip
