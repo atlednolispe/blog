@@ -2,6 +2,12 @@
 import os
 import sys
 
+try:
+    import mysqlclient
+except ModuleNotFoundError:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+
 if __name__ == "__main__":
     profile = os.environ.get('BLOG_PROFILE', 'product')
     # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "blog.settings.%s" % profile)

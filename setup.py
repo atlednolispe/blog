@@ -1,85 +1,42 @@
 from setuptools import setup, find_packages
 
+
+PACKAGES = find_packages('../blog')
+
+PACKAGES.extend(['static', 'templates'])
+
 # blog.egg-info/ is the information of packaging in python, need to be deleted if modify setup.py
 setup(
     name='blog',
-    version='0.1',
+    version='1.0',
     description="atlednolispe's simple blog established on django2.0.",
     author='atlednolispe',
     author_email='atlednolispe@gmail.com',
     url='http://www.mayangbin.com',
-    packages=find_packages('../blog'),  # (python3 blog/setup.py sdist)'s pwd/../blog to find
+    packages=PACKAGES,  # (python3 blog/setup.py sdist)'s pwd/../blog to find
     # packages=[''],  # package *.py if packages=['']
     # packages=['blog_nickname'],
     # package_dir={'blog_nickname': 'blog'},  # point out the name in packages
     # package_data={'docs': ['*.txt']},  # failed, use MANIFEST.in instead
     include_package_data=True,  # 配置MANIFEST.in文件 + packages=find_packages('../blog'),
     install_requires=[
-        'appnope==0.1.0',
-        'autopep8==1.3.4',
-        'certifi==2018.1.18',
-        'chardet==3.0.4',
         'coreapi==2.3.3',
-        'coreschema==0.0.4',
-        'decorator==4.2.1',
-        'diff-match-patch==20121119',
         'Django==2.0.2',
         'django-autocomplete-light==3.2.10',
         'django-ckeditor==5.4.0',
         'django-crispy-forms==1.7.0',
-        'django-debug-toolbar==1.9.1',
-        'django-formtools==2.1',
-        'django-import-export==1.0.0',
-        'django-js-asset==1.0.0',
         'django-redis==4.8.0',
-        'django-reversion==2.0.13',
-        'django-silk==2.0.0',
         'djangorestframework==3.7.7',
-        'et-xmlfile==1.0.1',
-        'future==0.16.0',
-        'gprof2dot==2016.10.13',
+        'django-reversion==2.0.13',
         'gunicorn==19.7.1',
         'hiredis==0.2.0',
-        'httplib2==0.9.2',
-        'idna==2.6',
-        'ipython==6.2.1',
-        'ipython-genutils==0.2.0',
-        'itypes==1.1.0',
-        'jdcal==1.3',
-        'jedi==0.11.1',
-        'Jinja2==2.10',
         'Markdown==2.6.11',
-        'MarkupSafe==1.0',
-        'mysqlclient==1.3.12',
-        'odfpy==1.3.6',
-        'openpyxl==2.5.0',
-        'parso==0.1.1',
-        'pexpect==4.4.0',
-        'pickleshare==0.7.4',
         'Pillow==5.0.0',
-        'prompt-toolkit==1.0.15',
-        'ptyprocess==0.5.2',
-        'pycodestyle==2.3.1',
-        'Pygments==2.2.0',
-        'python-dateutil==2.6.1',
-        'pytz==2017.3',
-        'PyYAML==3.12',
+        'PyMySQL==0.8.0',
         'redis==2.10.6',
-        'requests==2.18.4',
-        'simplegeneric==0.8.1',
-        'six==1.11.0',
-        'sqlparse==0.2.4',
-        'tablib==0.12.1',
-        'traitlets==4.3.2',
-        'unicodecsv==0.14.1',
-        'uritemplate==3.0.0',
-        'urllib3==1.22',
-        'wcwidth==0.1.7',
         'xadmin==2.0.1',
-        'xlrd==1.1.0',
-        'xlwt==1.3.0',
     ],
     scripts=[
-        'manage.py',
+        'manage.py',  # will be added to virtualenv/bin/manage.py
     ],
 )

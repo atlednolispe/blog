@@ -101,5 +101,6 @@ if DEBUG:
     SILKY_PYTHON_PROFILER = True
 else:
     ALLOWED_HOSTS = [  # required if DEBUG = False
+        atlednolispe_settings.ALLOWED_HOST1,
         '127.0.0.1',
     ]

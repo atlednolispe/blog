@@ -134,3 +134,136 @@ root@aliyun: ~# yum -y install epel-release
 
 root@aliyun: ~# yum install python-pip
 root@aliyun: ~# pip install -U pip
+
+6.
+问题描述: 下载python相关依赖
+(pypi) root@aliyun: packages# pip download -r ../requirements.txt --trusted-host mirrors.aliyun.com
+
+(pypi) root@aliyun: packages# pip3 download git+https://github.com/sshwsfc/xadmin
+
+7.
+问题描述: mysqlclient安装失败
+
+Collecting mysqlclient==1.3.12 (from -r ../requirements.txt (line 36))
+  File was already downloaded /root/pypi/packages/mysqlclient-1.3.12.tar.gz
+    Complete output from command python setup.py egg_info:
+    /bin/sh: mysql_config: command not found
+    Traceback (most recent call last):
+      File "<string>", line 1, in <module>
+      File "/tmp/pip-build-40h84xi1/mysqlclient/setup.py", line 17, in <module>
+        metadata, options = get_config()
+      File "/tmp/pip-build-40h84xi1/mysqlclient/setup_posix.py", line 44, in get_config
+        libs = mysql_config("libs_r")
+      File "/tmp/pip-build-40h84xi1/mysqlclient/setup_posix.py", line 26, in mysql_config
+        raise EnvironmentError("%s not found" % (mysql_config.path,))
+    OSError: mysql_config not found
+
+    ----------------------------------------
+Command "python setup.py egg_info" failed with error code 1 in /tmp/pip-build-40h84xi1/mysqlclient/
+
+解决方案:
+(pypi) root@aliyun: packages# yum install mysql-devel -y
+
+8.
+问题描述: fabric部署
+
+解决方案:
+(django20) atlednolispedeMBP:blog atlednolispe$ pip install fabric3
+
+9.
+问题描述: 通过pip+git安装的包的生成方式
+
+解决方案:
+# 通过私有pypi服务器是通过wheel包安装的,所以要在pypi服务器上面生成whl文件
+(pypi) root@aliyun: packages# pip install wheel
+
+(pypi) root@aliyun: xadmin-django2# python setup.py bdist_wheel
+
+(pypi) root@aliyun: xadmin-django2# cp dist/xadmin-2.0.1-py3-none-any.whl ../
+
+10.
+问题描述: centos无法安装mysqlclient
+
+原因:
+stackoverflow上面好像说是gcc的问题
+
+解决方案:
+把连接mysql的库由mysqlclient==1.3.12更换为'PyMySQL==0.8.0',
+
+# 需要把默认的mysql连接库修改
+# blog/manage.py
+import pymysql
+pymysql.install_as_MySQLdb()
+
+11.
+问题描述: 阿里云无法正常显示网页
+
+原因:
+ALLOWED_HOSTS未正确配置,并且没有运行collectstatic收集静态文件
+
+解决方案:
+# blog/blog/settings/product.py
+ALLOWED_HOSTS = [  # required if DEBUG = False
+    '.mayangbin.com',
+    '127.0.0.1',
+]
+
+12.
+问题描述: gunicorn启动
+
+解决方案:
+(django20) root@aliyun: blog-0.5# gunicorn blog.wsgi:application -w 4 -b 0.0.0.0:8000
+
+13.
+问题描述: supervisor管理进程
+
+解决方案:
+root@aliyun: ~# cd .virtualenvs/
+root@aliyun: .virtualenvs# ls
+django20  pypi
+ supervisor: .virtualenvs# virtualenv
+New python executable in /root/.virtualenvs/supervisor/bin/python2
+Also creating executable in /root/.virtualenvs/supervisor/bin/python
+Please make sure you remove any previous custom paths from your /root/.pydistutils.cfg file.
+Installing setuptools, pip, wheel...done.
+root@aliyun: .virtualenvs# source supervisor/bin/activate
+(supervisor) root@aliyun: supervisor# echo_supervisord_conf >> supervisord.conf
+
+# supervisord.conf
+[program:blog]
+command=/root/.virtualenvs/django20/bin/python /root/Test/blog-0.5/manage.py runserver 0.0.0.0:8000              ; the program (relative uses PATH, can take args)
+process_name=%(program_name)s ; process_name expr (default %(program_name)s)
+numprocs=1                    ; number of processes copies to start (def 1)
+directory=/root/supervisor/                ; directory to cwd to before exec (def no cwd)
+umask=022                     ; umask for process (default None)
+priority=999                  ; the relative start priority (default 999)
+autostart=true                ; start at supervisord start (default: true)
+user=root                   ; setuid to this UNIX account to run the program
+
+14.
+问题描述: 使用fabric通过pip安装自己打包的项目在指定的site-packages中没有静态文件
+
+原因:
+setup.py里面的packages只包含python的package,即使打包的时候包含了静态文件,fabric中pip安装时只会安装python的package,
+而不安装非python package的文件夹。
+
+解决方案:
+(1)
+# 不能使用['static.aeriel',]来加入非python package的dir
+# blog/setup.py
+PACKAGES.extend(['static', 'templates'])
+
+(2)
+将静态文件拆分到对应app/templates/下
+# recursive-include后必须要指定app,不然也不行
+# blog/MANIFEST.in
+recursive-include epsilon *.js *.css
+
+# 由于我的这个项目单独把templates分开了,所以我用了不好的办法
+PACKAGES.extend(['static', 'templates'])
+
+# 把存在atlednolispe_settings.py的路径加入到PYTHONPATH或者放到site-packages下执行激活虚拟环境后收集静态文件
+(django20) root@aliyun: ~# manage.py collectstatic
+(django20) root@aliyun: ~# manage.py runserver 0.0.0.0:9999
+
+# 终于可以正常显示项目,真的不容易呀!!!

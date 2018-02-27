@@ -6,7 +6,7 @@ xadmin: https://github.com/sshwsfc/xadmin
 
 (1)安装
 # 不能pip3安装,据说源有些问题
-(django20) atlednolispedeMBP:blog atlednolispe$ pip3 install git+https://github.com/sshwsfc/xadmin
+(django20) atlednolispedeMBP:blog atlednolispe$ pip install git+git://github.com/sshwsfc/xadmin.git@django2
 
 (django20) atlednolispedeMBP:blog atlednolispe$ rm blog/custom_site.py blog/custom_admin.py
 
