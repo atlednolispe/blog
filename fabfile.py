@@ -1,6 +1,6 @@
 import os
 
-from fabric.api import run, env, roles, prefix
+from fabric.api import run, env, roles, prefix, cd
 from fabric.contrib.files import exists
 
 from atlednolispe_fabric import HOST1, PYPI_SIMPLE_PATH, TRUSTED_HOST
@@ -21,6 +21,7 @@ def host_type():
 def deploy(version):
     ENV_PATH = '~/.virtualenvs/django20/'
     ACTIVE_FILE_PATH = os.path.join(ENV_PATH, 'bin/activate')
+    SUPERVISOR = os.path.join('~/.virtualenvs/supervisor/', 'bin/activate')
 
     if exists(ACTIVE_FILE_PATH):
         with prefix('source %s' % ACTIVE_FILE_PATH):
@@ -32,4 +33,7 @@ def deploy(version):
                     trusted_host=TRUSTED_HOST,
                 )
             )
-            # run('nohup gunicorn blog.wsgi:application -w 4 -b 0.0.0.0:8000 &')
+            run('cp ~/atlednolispe_settings.py ~/.virtualenvs/django20/lib/python3.6/site-packages/')
+            with prefix('source %s' % SUPERVISOR):
+                with cd('~/supervisor'):
+                    run('supervisord -c supervisord_blog.conf')
