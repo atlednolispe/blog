@@ -26,7 +26,7 @@ setup(
         'django-ckeditor==5.4.0',
         'django-crispy-forms==1.7.0',
         'django-redis==4.8.0',
-        'djangorestframework==3.7.7',
+        'djangorestframework==3.9.1',
         'django-reversion==2.0.13',
         'gunicorn==19.7.1',
         'hiredis==0.2.0',
