@@ -21,7 +21,7 @@ setup(
     include_package_data=True,  # 配置MANIFEST.in文件 + packages=find_packages('../blog'),
     install_requires=[
         'coreapi==2.3.3',
-        'Django==2.0.2',
+        'Django==2.2.13',
         'django-autocomplete-light==3.2.10',
         'django-ckeditor==5.4.0',
         'django-crispy-forms==1.7.0',
