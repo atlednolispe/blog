@@ -31,7 +31,7 @@ setup(
         'gunicorn==19.7.1',
         'hiredis==0.2.0',
         'Markdown==2.6.11',
-        'Pillow==5.0.0',
+        'Pillow==9.0.1',
         'PyMySQL==0.8.0',
         'redis==2.10.6',
         'xadmin==2.0.1',
